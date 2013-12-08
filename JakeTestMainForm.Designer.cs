@@ -17,11 +17,12 @@ namespace JakeTest
         private void InitializeComponent()
         {
             this.panel1 = new System.Windows.Forms.Panel();
-            this.button1 = new System.Windows.Forms.Button();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.button_Quit = new System.Windows.Forms.Button();
+            this.picturebox_DisplayImage = new System.Windows.Forms.PictureBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
-            this.button2 = new System.Windows.Forms.Button();
-            this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.button_LoadImage = new System.Windows.Forms.Button();
+            this.pictureBox_DetailImage = new System.Windows.Forms.PictureBox();
+            this.scroll_DetailImageScale = new System.Windows.Forms.HScrollBar();
             this.panel1.SuspendLayout();
             // 
             // panel1
@@ -29,33 +30,33 @@ namespace JakeTest
             this.panel1.Name = "panel1";
             this.panel1.Location = new System.Drawing.Point(16, 24);
             this.panel1.TabIndex = 0;
-            this.panel1.Controls.Add(this.button1);
-            this.panel1.Controls.Add(this.button2);
+            this.panel1.Controls.Add(this.button_Quit);
+            this.panel1.Controls.Add(this.button_LoadImage);
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.panel1.Size = new System.Drawing.Size(728, 48);
             this.panel1.BackColor = System.Drawing.SystemColors.ControlDark;
             this.panel1.Text = "panel1";
             // 
-            // button1
+            // button_Quit
             // 
-            this.button1.Name = "button1";
-            this.button1.Location = new System.Drawing.Point(8, 12);
-            this.button1.TabIndex = 0;
-            this.button1.ImeMode = System.Windows.Forms.ImeMode.Disable;
-            this.button1.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.button1.Text = "Quit";
-            this.button1.UseVisualStyleBackColor = true;
+            this.button_Quit.Name = "button_Quit";
+            this.button_Quit.Location = new System.Drawing.Point(8, 12);
+            this.button_Quit.TabIndex = 0;
+            this.button_Quit.ImeMode = System.Windows.Forms.ImeMode.Disable;
+            this.button_Quit.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.button_Quit.Text = "Quit";
+            this.button_Quit.UseVisualStyleBackColor = true;
             // 
-            // pictureBox1
+            // picturebox_DisplayImage
             // 
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Location = new System.Drawing.Point(16, 80);
-            this.pictureBox1.Image = null;
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.pictureBox1.Size = new System.Drawing.Size(512, 512);
-            this.pictureBox1.BackColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.pictureBox1.Text = "pictureBox1";
+            this.picturebox_DisplayImage.Name = "picturebox_DisplayImage";
+            this.picturebox_DisplayImage.Location = new System.Drawing.Point(16, 80);
+            this.picturebox_DisplayImage.Image = null;
+            this.picturebox_DisplayImage.TabIndex = 0;
+            this.picturebox_DisplayImage.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.picturebox_DisplayImage.Size = new System.Drawing.Size(512, 512);
+            this.picturebox_DisplayImage.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.picturebox_DisplayImage.Text = "pictureBox1";
             // 
             // textBox1
             // 
@@ -68,43 +69,57 @@ namespace JakeTest
             this.textBox1.BackColor = System.Drawing.SystemColors.Window;
             this.textBox1.Text = "";
             // 
-            // button2
+            // button_LoadImage
             // 
-            this.button2.Name = "button2";
-            this.button2.Location = new System.Drawing.Point(96, 12);
-            this.button2.TabIndex = 0;
-            this.button2.ImeMode = System.Windows.Forms.ImeMode.Disable;
-            this.button2.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.button2.Text = "Load Image";
-            this.button2.UseVisualStyleBackColor = true;
+            this.button_LoadImage.Name = "button_LoadImage";
+            this.button_LoadImage.Location = new System.Drawing.Point(96, 12);
+            this.button_LoadImage.TabIndex = 0;
+            this.button_LoadImage.ImeMode = System.Windows.Forms.ImeMode.Disable;
+            this.button_LoadImage.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.button_LoadImage.Text = "Load Image";
+            this.button_LoadImage.UseVisualStyleBackColor = true;
             // 
-            // pictureBox2
+            // pictureBox_DetailImage
             // 
-            this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Location = new System.Drawing.Point(544, 88);
-            this.pictureBox2.Image = null;
-            this.pictureBox2.TabIndex = 2;
-            this.pictureBox2.Size = new System.Drawing.Size(200, 200);
-            this.pictureBox2.BackColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.pictureBox2.Text = "pictureBox2";
+            this.pictureBox_DetailImage.Name = "pictureBox_DetailImage";
+            this.pictureBox_DetailImage.Location = new System.Drawing.Point(544, 88);
+            this.pictureBox_DetailImage.Image = null;
+            this.pictureBox_DetailImage.TabIndex = 2;
+            this.pictureBox_DetailImage.Size = new System.Drawing.Size(200, 200);
+            this.pictureBox_DetailImage.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.pictureBox_DetailImage.Text = "pictureBox2";
+            // 
+            // scroll_DetailImageScale
+            // 
+            this.scroll_DetailImageScale.Tag = "detailImageScale";
+            this.scroll_DetailImageScale.Size = new System.Drawing.Size(184, 29);
+            this.scroll_DetailImageScale.Name = "scroll_DetailImageScale";
+            this.scroll_DetailImageScale.Value = 2;
+            this.scroll_DetailImageScale.LargeChange = 1;
+            this.scroll_DetailImageScale.Location = new System.Drawing.Point(552, 304);
+            this.scroll_DetailImageScale.Maximum = 10;
+            this.scroll_DetailImageScale.Minimum = 1;
+            this.scroll_DetailImageScale.TabIndex = 3;
             // 
             // JakeTestMain
             // 
             this.Name = "JakeTestMain";
             this.ClientSize = new System.Drawing.Size(758, 645);
             this.Controls.Add(this.panel1);
-            this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.picturebox_DisplayImage);
             this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.pictureBox2);
+            this.Controls.Add(this.pictureBox_DetailImage);
+            this.Controls.Add(this.scroll_DetailImageScale);
             this.Text = "JakeTestMain_Jake";
             this.panel1.ResumeLayout(false);
         }
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.Button button_Quit;
+        private System.Windows.Forms.PictureBox picturebox_DisplayImage;
         private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.PictureBox pictureBox2;
+        private System.Windows.Forms.Button button_LoadImage;
+        private System.Windows.Forms.PictureBox pictureBox_DetailImage;
+        private System.Windows.Forms.HScrollBar scroll_DetailImageScale;
     }
     #endregion
 }

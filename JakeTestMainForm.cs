@@ -26,8 +26,8 @@ namespace JakeTest
 			m_displayImageX = 0;
 			m_displayImageY = 0;
 			m_displayImageDisplayScale = 1.0f;
-			m_displayImageWidth = this.pictureBox1.Width;
-			m_displayImageHeight = this.pictureBox1.Height;
+			m_displayImageWidth = this.picturebox_DisplayImage.Width;
+			m_displayImageHeight = this.picturebox_DisplayImage.Height;
 			m_displayImage = new Bitmap(m_displayImageWidth, m_displayImageHeight);
 			m_displayGR = Graphics.FromImage(m_displayImage);
 			m_displayGR.InterpolationMode = InterpolationMode.HighQualityBicubic;
@@ -36,18 +36,19 @@ namespace JakeTest
 			m_detailImageX = 0;
 			m_detailImageY = 0;
 			m_detailImageDisplayScale = 2.0f;
-			m_detailImageWidth = this.pictureBox2.Width;
-			m_detailImageHeight = this.pictureBox2.Height;
+			m_detailImageWidth = this.pictureBox_DetailImage.Width;
+			m_detailImageHeight = this.pictureBox_DetailImage.Height;
 			m_detailImage = new Bitmap(m_detailImageWidth, m_detailImageHeight);
 			m_detailGR = Graphics.FromImage(m_detailImage);
 			m_detailGR.InterpolationMode = InterpolationMode.HighQualityBicubic;
 			UpdateDetailImage();
 
-			this.pictureBox1.MouseMove += new MouseEventHandler(Image_MouseMove);
-			this.pictureBox1.MouseDown += new MouseEventHandler(Image_MouseDown);
-			this.pictureBox1.MouseUp += new MouseEventHandler(Image_MouseUp);
-			this.button1.Click += new EventHandler(Quit_Click);
-			this.button2.Click += new EventHandler(LoadFile_Click);
+			this.picturebox_DisplayImage.MouseMove += new MouseEventHandler(DisplayImage_MouseMove);
+			this.picturebox_DisplayImage.MouseDown += new MouseEventHandler(DisplayImage_MouseDown);
+			this.picturebox_DisplayImage.MouseUp += new MouseEventHandler(DisplayImage_MouseUp);
+			this.button_Quit.Click += new EventHandler(Quit_Click);
+			this.button_LoadImage.Click += new EventHandler(LoadFile_Click);
+			this.scroll_DetailImageScale.ValueChanged += new EventHandler(DetailImageScale_Changed);
 
 			this.DoubleBuffered = true;
 		}
@@ -85,7 +86,7 @@ namespace JakeTest
 		{
 			this.textBox1.Text = status;
 		}
-		private void Image_MouseMove (object sender, MouseEventArgs e)
+		private void DisplayImage_MouseMove (object sender, MouseEventArgs e)
 		{
 			int curX = e.Location.X;
 			int curY = e.Location.Y;
@@ -106,14 +107,14 @@ namespace JakeTest
 			string text = e.Location.ToString();
 			SetStatus(text);
 		} 
-		private void Image_MouseDown(object sender, MouseEventArgs e)
+		private void DisplayImage_MouseDown(object sender, MouseEventArgs e)
 		{
 			m_dragging = true;
 			m_dragX = e.Location.X;
 			m_dragY = e.Location.Y;
 			SetStatus("Dragging Start " + e.Location.ToString());
 		}
-		private void Image_MouseUp(object sender, MouseEventArgs e)
+		private void DisplayImage_MouseUp(object sender, MouseEventArgs e)
 		{
 			m_dragging = false;
 
@@ -129,6 +130,13 @@ namespace JakeTest
 			UpdateDetailImage();
 
 			SetStatus("Dragging Stop");
+		}
+		private void DetailImageScale_Changed(object sender, EventArgs e)
+		{
+			int value = this.scroll_DetailImageScale.Value;
+			m_detailImageDisplayScale = (float)(value);
+			UpdateDetailImage();
+			SetStatus("ImageScale:" + value);
 		}
 		private void UpdateDisplayImage()
 		{
@@ -148,7 +156,7 @@ namespace JakeTest
 			                      	new Rectangle(sx, sy, drawW, drawH),
 			                      	GraphicsUnit.Pixel);
 			}
-			pictureBox1.Image = m_displayImage;
+			picturebox_DisplayImage.Image = m_displayImage;
 		}
 		private void UpdateDetailImage()
 		{
@@ -183,7 +191,7 @@ namespace JakeTest
     	m_detailGR.DrawLine(cursorColour, halfW - cursorOffset, halfH, halfW - cursorOffset - cursorLen, halfH);
     	m_detailGR.DrawLine(cursorColour, halfW + cursorOffset, halfH, halfW + cursorOffset + cursorLen, halfH);
 
-			pictureBox2.Image = m_detailImage;
+			pictureBox_DetailImage.Image = m_detailImage;
 		}
 		private Bitmap m_loadedImage;
 		private int m_loadedImageWidth;
