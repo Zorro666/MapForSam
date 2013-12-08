@@ -1,0 +1,2 @@
+#! /bin/bash 
+mono ~/Apps/mwf-designer/build/mwf-designer.exe JakeTestMainForm.cs &
