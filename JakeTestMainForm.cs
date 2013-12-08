@@ -184,8 +184,8 @@ namespace JakeTest
 
 				int sW = (int)((float)(m_displayImageWidth) / m_displayImageDisplayScale);
 				int sH = (int)((float)(m_displayImageHeight) / m_displayImageDisplayScale);
-				int sX = mX;
-				int sY = mY;
+				int sX = (int)((float)(mX) / m_displayImageDisplayScale);
+				int sY = (int)((float)(mY) / m_displayImageDisplayScale);
 				Rectangle srcRect = new Rectangle(sX, sY, sW, sH);
 
 				m_displayGR.DrawImage(m_loadedImage, destRect, srcRect, GraphicsUnit.Pixel);
@@ -201,6 +201,8 @@ namespace JakeTest
 			{
 				int mX = m_detailImageX + m_displayImageX;
 				int mY = m_detailImageY + m_displayImageY;
+				mX = (int)((float)(mX) / m_displayImageDisplayScale);
+				mY = (int)((float)(mY) / m_displayImageDisplayScale);
 
 				int dX = 0;
 				int dY = 0;

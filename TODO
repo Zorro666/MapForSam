@@ -1,4 +1,3 @@
-* handle detail image display when main image zooms
 * mode to lock detail image: key press or mouse (right click)
 * display image source x,y display above detail image + locked status
 * zoom, unzoom about mouse cursor position
