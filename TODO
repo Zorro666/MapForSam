@@ -1,0 +1,4 @@
+* add a zoom slider for the detail image (x1 -> x10)
+* add double left click to zoom main image + shift = unzoom, (x0.1->x10)
+* handle detail image display when main image pans
+* handle detail image display when main image zoom

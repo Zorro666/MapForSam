@@ -21,6 +21,7 @@ namespace JakeTest
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.button2 = new System.Windows.Forms.Button();
+            this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.panel1.SuspendLayout();
             // 
             // panel1
@@ -31,7 +32,7 @@ namespace JakeTest
             this.panel1.Controls.Add(this.button1);
             this.panel1.Controls.Add(this.button2);
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.panel1.Size = new System.Drawing.Size(520, 48);
+            this.panel1.Size = new System.Drawing.Size(728, 48);
             this.panel1.BackColor = System.Drawing.SystemColors.ControlDark;
             this.panel1.Text = "panel1";
             // 
@@ -63,7 +64,7 @@ namespace JakeTest
             this.textBox1.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.textBox1.Location = new System.Drawing.Point(24, 608);
             this.textBox1.TabIndex = 1;
-            this.textBox1.Size = new System.Drawing.Size(504, 20);
+            this.textBox1.Size = new System.Drawing.Size(720, 20);
             this.textBox1.BackColor = System.Drawing.SystemColors.Window;
             this.textBox1.Text = "";
             // 
@@ -77,13 +78,24 @@ namespace JakeTest
             this.button2.Text = "Load Image";
             this.button2.UseVisualStyleBackColor = true;
             // 
+            // pictureBox2
+            // 
+            this.pictureBox2.Name = "pictureBox2";
+            this.pictureBox2.Location = new System.Drawing.Point(544, 88);
+            this.pictureBox2.Image = null;
+            this.pictureBox2.TabIndex = 2;
+            this.pictureBox2.Size = new System.Drawing.Size(200, 200);
+            this.pictureBox2.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.pictureBox2.Text = "pictureBox2";
+            // 
             // JakeTestMain
             // 
             this.Name = "JakeTestMain";
-            this.ClientSize = new System.Drawing.Size(552, 645);
+            this.ClientSize = new System.Drawing.Size(758, 645);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.pictureBox2);
             this.Text = "JakeTestMain_Jake";
             this.panel1.ResumeLayout(false);
         }
@@ -92,6 +104,7 @@ namespace JakeTest
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.PictureBox pictureBox2;
     }
     #endregion
 }
