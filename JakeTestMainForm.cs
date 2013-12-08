@@ -112,11 +112,13 @@ namespace JakeTest
 			m_dragging = true;
 			m_dragX = e.Location.X;
 			m_dragY = e.Location.Y;
+			this.Cursor = Cursors.Cross;
 			SetStatus("Dragging Start " + e.Location.ToString());
 		}
 		private void DisplayImage_MouseUp(object sender, MouseEventArgs e)
 		{
 			m_dragging = false;
+			this.Cursor = Cursors.Default;
 
 			int curX = e.Location.X;
 			int curY = e.Location.Y;
