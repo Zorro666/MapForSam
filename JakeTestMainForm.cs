@@ -48,6 +48,8 @@ namespace JakeTest
 			this.pictureBox1.MouseUp += new MouseEventHandler(Image_MouseUp);
 			this.button1.Click += new EventHandler(Quit_Click);
 			this.button2.Click += new EventHandler(LoadFile_Click);
+
+			this.DoubleBuffered = true;
 		}
 		private void Quit_Click(object sender, EventArgs e)
 		{
@@ -114,6 +116,18 @@ namespace JakeTest
 		private void Image_MouseUp(object sender, MouseEventArgs e)
 		{
 			m_dragging = false;
+
+			int curX = e.Location.X;
+			int curY = e.Location.Y;
+
+			m_dragX = curX;
+			m_dragY = curY;
+			UpdateDisplayImage();
+
+			m_detailImageX = curX;
+			m_detailImageY = curY;
+			UpdateDetailImage();
+
 			SetStatus("Dragging Stop");
 		}
 		private void UpdateDisplayImage()
@@ -143,8 +157,8 @@ namespace JakeTest
 			int dH = m_detailImageHeight;
 			if (m_loadedImage != null) 
 			{
-				int mX = m_detailImageX;
-				int mY = m_detailImageY;
+				int mX = m_detailImageX + m_displayImageX;
+				int mY = m_detailImageY + m_displayImageY;
 
 				int dX = 0;
 				int dY = 0;
