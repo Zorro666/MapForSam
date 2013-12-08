@@ -16,26 +16,34 @@ namespace JakeTest
     {
         private void InitializeComponent()
         {
-            this.panel1 = new System.Windows.Forms.Panel();
+            this.panel_Top = new System.Windows.Forms.Panel();
             this.button_Quit = new System.Windows.Forms.Button();
             this.picturebox_DisplayImage = new System.Windows.Forms.PictureBox();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.text_Status = new System.Windows.Forms.TextBox();
             this.button_LoadImage = new System.Windows.Forms.Button();
             this.pictureBox_DetailImage = new System.Windows.Forms.PictureBox();
             this.scroll_DetailImageScale = new System.Windows.Forms.HScrollBar();
-            this.panel1.SuspendLayout();
+            this.text_Northing = new System.Windows.Forms.TextBox();
+            this.label_Northing = new System.Windows.Forms.Label();
+            this.label_Easting = new System.Windows.Forms.Label();
+            this.text_Easting = new System.Windows.Forms.TextBox();
+            this.label_ImageX = new System.Windows.Forms.Label();
+            this.text_ImageX = new System.Windows.Forms.TextBox();
+            this.text_ImageY = new System.Windows.Forms.TextBox();
+            this.label_ImageY = new System.Windows.Forms.Label();
+            this.panel_Top.SuspendLayout();
             // 
-            // panel1
+            // panel_Top
             // 
-            this.panel1.Name = "panel1";
-            this.panel1.Location = new System.Drawing.Point(16, 24);
-            this.panel1.TabIndex = 0;
-            this.panel1.Controls.Add(this.button_Quit);
-            this.panel1.Controls.Add(this.button_LoadImage);
-            this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.panel1.Size = new System.Drawing.Size(728, 48);
-            this.panel1.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.panel1.Text = "panel1";
+            this.panel_Top.Name = "panel_Top";
+            this.panel_Top.Location = new System.Drawing.Point(16, 24);
+            this.panel_Top.TabIndex = 0;
+            this.panel_Top.Controls.Add(this.button_Quit);
+            this.panel_Top.Controls.Add(this.button_LoadImage);
+            this.panel_Top.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.panel_Top.Size = new System.Drawing.Size(728, 48);
+            this.panel_Top.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.panel_Top.Text = "panel1";
             // 
             // button_Quit
             // 
@@ -58,16 +66,16 @@ namespace JakeTest
             this.picturebox_DisplayImage.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.picturebox_DisplayImage.Text = "pictureBox1";
             // 
-            // textBox1
+            // text_Status
             // 
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.textBox1.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.textBox1.Location = new System.Drawing.Point(24, 608);
-            this.textBox1.TabIndex = 1;
-            this.textBox1.Size = new System.Drawing.Size(720, 20);
-            this.textBox1.BackColor = System.Drawing.SystemColors.Window;
-            this.textBox1.Text = "";
+            this.text_Status.Name = "text_Status";
+            this.text_Status.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.text_Status.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.text_Status.Location = new System.Drawing.Point(24, 608);
+            this.text_Status.TabIndex = 1;
+            this.text_Status.Size = new System.Drawing.Size(720, 20);
+            this.text_Status.BackColor = System.Drawing.SystemColors.Window;
+            this.text_Status.Text = "";
             // 
             // button_LoadImage
             // 
@@ -82,7 +90,7 @@ namespace JakeTest
             // pictureBox_DetailImage
             // 
             this.pictureBox_DetailImage.Name = "pictureBox_DetailImage";
-            this.pictureBox_DetailImage.Location = new System.Drawing.Point(544, 88);
+            this.pictureBox_DetailImage.Location = new System.Drawing.Point(536, 80);
             this.pictureBox_DetailImage.Image = null;
             this.pictureBox_DetailImage.TabIndex = 2;
             this.pictureBox_DetailImage.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
@@ -97,30 +105,126 @@ namespace JakeTest
             this.scroll_DetailImageScale.Name = "scroll_DetailImageScale";
             this.scroll_DetailImageScale.Value = 2;
             this.scroll_DetailImageScale.LargeChange = 1;
-            this.scroll_DetailImageScale.Location = new System.Drawing.Point(552, 304);
+            this.scroll_DetailImageScale.Location = new System.Drawing.Point(544, 288);
             this.scroll_DetailImageScale.Maximum = 10;
             this.scroll_DetailImageScale.Minimum = 2;
             this.scroll_DetailImageScale.TabIndex = 3;
+            // 
+            // text_Northing
+            // 
+            this.text_Northing.Name = "text_Northing";
+            this.text_Northing.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.text_Northing.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.text_Northing.Location = new System.Drawing.Point(616, 360);
+            this.text_Northing.TabIndex = 4;
+            this.text_Northing.Size = new System.Drawing.Size(96, 20);
+            this.text_Northing.ReadOnly = true;
+            this.text_Northing.Text = "";
+            // 
+            // label_Northing
+            // 
+            this.label_Northing.Name = "label_Northing";
+            this.label_Northing.Location = new System.Drawing.Point(552, 360);
+            this.label_Northing.Image = null;
+            this.label_Northing.TabIndex = 5;
+            this.label_Northing.Size = new System.Drawing.Size(56, 20);
+            this.label_Northing.Text = "Northing:";
+            // 
+            // label_Easting
+            // 
+            this.label_Easting.Name = "label_Easting";
+            this.label_Easting.Location = new System.Drawing.Point(552, 328);
+            this.label_Easting.Image = null;
+            this.label_Easting.TabIndex = 5;
+            this.label_Easting.Size = new System.Drawing.Size(56, 20);
+            this.label_Easting.Text = "Easting:";
+            // 
+            // text_Easting
+            // 
+            this.text_Easting.Name = "text_Easting";
+            this.text_Easting.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.text_Easting.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.text_Easting.Location = new System.Drawing.Point(616, 328);
+            this.text_Easting.TabIndex = 4;
+            this.text_Easting.Size = new System.Drawing.Size(96, 20);
+            this.text_Easting.ReadOnly = true;
+            this.text_Easting.Text = "";
+            // 
+            // label_ImageX
+            // 
+            this.label_ImageX.Name = "label_ImageX";
+            this.label_ImageX.Location = new System.Drawing.Point(552, 388);
+            this.label_ImageX.Image = null;
+            this.label_ImageX.TabIndex = 5;
+            this.label_ImageX.Size = new System.Drawing.Size(56, 20);
+            this.label_ImageX.Text = "Image X:";
+            // 
+            // text_ImageX
+            // 
+            this.text_ImageX.Name = "text_ImageX";
+            this.text_ImageX.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.text_ImageX.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.text_ImageX.Location = new System.Drawing.Point(616, 388);
+            this.text_ImageX.TabIndex = 4;
+            this.text_ImageX.Size = new System.Drawing.Size(96, 20);
+            this.text_ImageX.ReadOnly = true;
+            this.text_ImageX.Text = "";
+            // 
+            // text_ImageY
+            // 
+            this.text_ImageY.Name = "text_ImageY";
+            this.text_ImageY.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.text_ImageY.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.text_ImageY.Location = new System.Drawing.Point(616, 420);
+            this.text_ImageY.TabIndex = 4;
+            this.text_ImageY.Size = new System.Drawing.Size(96, 20);
+            this.text_ImageY.ReadOnly = true;
+            this.text_ImageY.Text = "";
+            // 
+            // label_ImageY
+            // 
+            this.label_ImageY.Name = "label_ImageY";
+            this.label_ImageY.Location = new System.Drawing.Point(552, 418);
+            this.label_ImageY.Image = null;
+            this.label_ImageY.TabIndex = 5;
+            this.label_ImageY.Size = new System.Drawing.Size(56, 20);
+            this.label_ImageY.Text = "Image Y:";
             // 
             // JakeTestMain
             // 
             this.Name = "JakeTestMain";
             this.ClientSize = new System.Drawing.Size(758, 645);
-            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.panel_Top);
             this.Controls.Add(this.picturebox_DisplayImage);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.text_Status);
             this.Controls.Add(this.pictureBox_DetailImage);
             this.Controls.Add(this.scroll_DetailImageScale);
-            this.Text = "JakeTestMain_Jake";
-            this.panel1.ResumeLayout(false);
+            this.Controls.Add(this.text_Northing);
+            this.Controls.Add(this.label_Northing);
+            this.Controls.Add(this.label_Easting);
+            this.Controls.Add(this.text_Easting);
+            this.Controls.Add(this.label_ImageX);
+            this.Controls.Add(this.text_ImageX);
+            this.Controls.Add(this.text_ImageY);
+            this.Controls.Add(this.label_ImageY);
+            this.Text = "Sam's Map Tool";
+            this.panel_Top.ResumeLayout(false);
         }
-        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Panel panel_Top;
         private System.Windows.Forms.Button button_Quit;
         private System.Windows.Forms.PictureBox picturebox_DisplayImage;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox text_Status;
         private System.Windows.Forms.Button button_LoadImage;
         private System.Windows.Forms.PictureBox pictureBox_DetailImage;
         private System.Windows.Forms.HScrollBar scroll_DetailImageScale;
+        private System.Windows.Forms.TextBox text_Northing;
+        private System.Windows.Forms.Label label_Northing;
+        private System.Windows.Forms.Label label_Easting;
+        private System.Windows.Forms.TextBox text_Easting;
+        private System.Windows.Forms.Label label_ImageX;
+        private System.Windows.Forms.TextBox text_ImageX;
+        private System.Windows.Forms.TextBox text_ImageY;
+        private System.Windows.Forms.Label label_ImageY;
     }
     #endregion
 }

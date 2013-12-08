@@ -81,11 +81,21 @@ namespace JakeTest
 			UpdateDisplayImage();
 			UpdateDetailImage();
 
-			SetStatus(string.Format("Loaded '{0}' {1} x {2}", fileName, m_loadedImageWidth, m_loadedImageHeight));
+			SetStatusText(string.Format("Loaded '{0}' {1} x {2}", fileName, m_loadedImageWidth, m_loadedImageHeight));
 		}
-		private void SetStatus(string status)
+		private void SetStatusText(string status)
 		{
-			this.textBox1.Text = status;
+			this.text_Status.Text = status;
+		}
+		private void SetImageXYText()
+		{
+			int mX = m_detailImageX + m_displayImageX;
+			int mY = m_detailImageY + m_displayImageY;
+			mX = (int)((float)(mX) / m_displayImageDisplayScale);
+			mY = (int)((float)(mY) / m_displayImageDisplayScale);
+
+			this.text_ImageX.Text = mX.ToString();
+			this.text_ImageY.Text = mY.ToString();
 		}
 		private void DisplayImage_MouseMove (object sender, MouseEventArgs e)
 		{
@@ -104,9 +114,10 @@ namespace JakeTest
 				m_detailImageX = curX;
 				m_detailImageY = curY;
 				UpdateDetailImage();
+				SetImageXYText();
 			}
 			string text = e.Location.ToString();
-			SetStatus(text);
+			SetStatusText(text);
 		} 
 		private void DisplayImage_MouseDown(object sender, MouseEventArgs e)
 		{
@@ -114,7 +125,7 @@ namespace JakeTest
 			m_dragX = e.Location.X;
 			m_dragY = e.Location.Y;
 			this.Cursor = Cursors.Cross;
-			SetStatus("Dragging Start " + e.Location.ToString());
+			SetStatusText("Dragging Start " + e.Location.ToString());
 		}
 		private void DisplayImage_MouseUp(object sender, MouseEventArgs e)
 		{
@@ -132,12 +143,12 @@ namespace JakeTest
 			m_detailImageY = curY;
 			UpdateDetailImage();
 
-			SetStatus("Dragging Stop");
+			SetStatusText("Dragging Stop");
 		}
 		private void DisplayImage_MouseDoubleClick (object sender, MouseEventArgs e)
 		{
 			float startScale = m_displayImageDisplayScale;
-			SetStatus("Double-click:" + e.Button);
+			SetStatusText("Double-click:" + e.Button);
 			float zoomAmount = 0.0f;
 			if (e.Button == MouseButtons.Left)
 			{
@@ -158,7 +169,7 @@ namespace JakeTest
 			{
 				m_displayImageDisplayScale = startScale;
 				UpdateDisplayImage();
-				SetStatus("ImageDisplayScale:" + m_displayImageDisplayScale);
+				SetStatusText("ImageDisplayScale:" + m_displayImageDisplayScale);
 			}
 		}
 		private void DetailImageScale_Changed(object sender, EventArgs e)
@@ -166,7 +177,7 @@ namespace JakeTest
 			int value = this.scroll_DetailImageScale.Value;
 			m_detailImageDisplayScale = (float)(value);
 			UpdateDetailImage();
-			SetStatus("ImageScale:" + value);
+			SetStatusText("ImageScale:" + value);
 		}
 		private void UpdateDisplayImage()
 		{
@@ -192,26 +203,32 @@ namespace JakeTest
 			}
 			picturebox_DisplayImage.Image = m_displayImage;
 		}
+		private void ComputeImageXY()
+		{
+			int mX = m_detailImageX + m_displayImageX;
+			int mY = m_detailImageY + m_displayImageY;
+			mX = (int)((float)(mX) / m_displayImageDisplayScale);
+			mY = (int)((float)(mY) / m_displayImageDisplayScale);
+			m_sourceImagePixelX = mX;
+			m_sourceImagePixelY = mY;
+		}
 		private void UpdateDetailImage()
 		{
+			ComputeImageXY();
+
 			m_detailGR.Clear(Color.DarkGray);
 			int dW = m_detailImageWidth;
 			int dH = m_detailImageHeight;
 			if (m_loadedImage != null) 
 			{
-				int mX = m_detailImageX + m_displayImageX;
-				int mY = m_detailImageY + m_displayImageY;
-				mX = (int)((float)(mX) / m_displayImageDisplayScale);
-				mY = (int)((float)(mY) / m_displayImageDisplayScale);
-
 				int dX = 0;
 				int dY = 0;
 				Rectangle destRect = new Rectangle(dX, dY, dW, dH);
 
 				int sW = (int)((float)(m_detailImageWidth) / m_detailImageDisplayScale);
 				int sH = (int)((float)(m_detailImageHeight) / m_detailImageDisplayScale);
-				int sX = mX - (sW / 2);
-				int sY = mY - (sH / 2);
+				int sX = m_sourceImagePixelX - (sW / 2);
+				int sY = m_sourceImagePixelY - (sH / 2);
 				Rectangle srcRect = new Rectangle(sX, sY, sW, sH);
 
 				m_detailGR.DrawImage(m_loadedImage, destRect, srcRect, GraphicsUnit.Pixel);
@@ -240,6 +257,8 @@ namespace JakeTest
 		private float m_displayImageDisplayScale;
 		private int m_displayImageX;
 		private int m_displayImageY;
+		private int m_sourceImagePixelX;
+		private int	m_sourceImagePixelY;
 
 		private Bitmap m_detailImage;
 		private Graphics m_detailGR;
