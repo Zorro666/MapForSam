@@ -85,20 +85,21 @@ namespace JakeTest
             this.pictureBox_DetailImage.Location = new System.Drawing.Point(544, 88);
             this.pictureBox_DetailImage.Image = null;
             this.pictureBox_DetailImage.TabIndex = 2;
+            this.pictureBox_DetailImage.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.pictureBox_DetailImage.Size = new System.Drawing.Size(200, 200);
             this.pictureBox_DetailImage.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.pictureBox_DetailImage.Text = "pictureBox2";
             // 
             // scroll_DetailImageScale
             // 
-            this.scroll_DetailImageScale.Tag = "detailImageScale";
+            this.scroll_DetailImageScale.Tag = "";
             this.scroll_DetailImageScale.Size = new System.Drawing.Size(184, 29);
             this.scroll_DetailImageScale.Name = "scroll_DetailImageScale";
             this.scroll_DetailImageScale.Value = 2;
             this.scroll_DetailImageScale.LargeChange = 1;
             this.scroll_DetailImageScale.Location = new System.Drawing.Point(552, 304);
             this.scroll_DetailImageScale.Maximum = 10;
-            this.scroll_DetailImageScale.Minimum = 1;
+            this.scroll_DetailImageScale.Minimum = 2;
             this.scroll_DetailImageScale.TabIndex = 3;
             // 
             // JakeTestMain
