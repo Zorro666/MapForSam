@@ -89,13 +89,8 @@ namespace JakeTest
 		}
 		private void SetImageXYText()
 		{
-			int mX = m_detailImageX + m_displayImageX;
-			int mY = m_detailImageY + m_displayImageY;
-			mX = (int)((float)(mX) / m_displayImageDisplayScale);
-			mY = (int)((float)(mY) / m_displayImageDisplayScale);
-
-			this.text_ImageX.Text = mX.ToString();
-			this.text_ImageY.Text = mY.ToString();
+			this.text_ImageX.Text = m_sourceImagePixelX.ToString();
+			this.text_ImageY.Text = m_sourceImagePixelY.ToString();
 		}
 		private void DisplayImage_MouseMove (object sender, MouseEventArgs e)
 		{
@@ -147,7 +142,7 @@ namespace JakeTest
 		}
 		private void DisplayImage_MouseDoubleClick (object sender, MouseEventArgs e)
 		{
-			float startScale = m_displayImageDisplayScale;
+			float displayScale = m_displayImageDisplayScale;
 			SetStatusText("Double-click:" + e.Button);
 			float zoomAmount = 0.0f;
 			if (e.Button == MouseButtons.Left)
@@ -162,14 +157,27 @@ namespace JakeTest
 			{
 				zoomAmount *= -1.0f;
 			}
-			startScale += zoomAmount;
-			startScale = Math.Max(startScale, 1.0f);
-			startScale = Math.Min(startScale, 10.0f);
-			if (startScale != m_displayImageDisplayScale)
+			displayScale += zoomAmount;
+			displayScale = Math.Max(displayScale, 1.0f);
+			displayScale = Math.Min(displayScale, 10.0f);
+			if (displayScale != m_displayImageDisplayScale)
 			{
-				m_displayImageDisplayScale = startScale;
-				UpdateDisplayImage();
+				ComputeImageXY();
+				int oldX = m_sourceImagePixelX;
+				int oldY = m_sourceImagePixelY;
+				m_displayImageDisplayScale = displayScale;
+				ComputeImageXY();
+				m_displayImageX -= (int)((float)(m_sourceImagePixelX - oldX) * m_displayImageDisplayScale);
+				m_displayImageY -= (int)((float)(m_sourceImagePixelY - oldY) * m_displayImageDisplayScale);
 				SetStatusText("ImageDisplayScale:" + m_displayImageDisplayScale);
+				ComputeImageXY();
+
+				int newX = m_sourceImagePixelX;
+				int newY = m_sourceImagePixelY;
+				if (newX != oldX)
+					MessageBox.Show(string.Format("newX != oldX {0} != {1}", newX, oldX));
+				if (newY != oldY)
+					MessageBox.Show(string.Format("newY != oldY {0} != {1}", newY, oldY));
 			}
 		}
 		private void DetailImageScale_Changed(object sender, EventArgs e)
