@@ -46,6 +46,7 @@ namespace JakeTest
 			this.picturebox_DisplayImage.MouseMove += new MouseEventHandler(DisplayImage_MouseMove);
 			this.picturebox_DisplayImage.MouseDown += new MouseEventHandler(DisplayImage_MouseDown);
 			this.picturebox_DisplayImage.MouseUp += new MouseEventHandler(DisplayImage_MouseUp);
+			this.picturebox_DisplayImage.MouseDoubleClick += new MouseEventHandler(DisplayImage_MouseDoubleClick);
 			this.button_Quit.Click += new EventHandler(Quit_Click);
 			this.button_LoadImage.Click += new EventHandler(LoadFile_Click);
 			this.scroll_DetailImageScale.ValueChanged += new EventHandler(DetailImageScale_Changed);
@@ -133,6 +134,33 @@ namespace JakeTest
 
 			SetStatus("Dragging Stop");
 		}
+		private void DisplayImage_MouseDoubleClick (object sender, MouseEventArgs e)
+		{
+			float startScale = m_displayImageDisplayScale;
+			SetStatus("Double-click:" + e.Button);
+			float zoomAmount = 0.0f;
+			if (e.Button == MouseButtons.Left)
+			{
+				zoomAmount = 1.0f;
+			}
+			else if (e.Button == MouseButtons.Right)
+			{
+				zoomAmount = -1.0f;
+			}
+			if (Control.ModifierKeys == Keys.Shift)
+			{
+				zoomAmount *= -1.0f;
+			}
+			startScale += zoomAmount;
+			startScale = Math.Max(startScale, 1.0f);
+			startScale = Math.Min(startScale, 10.0f);
+			if (startScale != m_displayImageDisplayScale)
+			{
+				m_displayImageDisplayScale = startScale;
+				UpdateDisplayImage();
+				SetStatus("ImageDisplayScale:" + m_displayImageDisplayScale);
+			}
+		}
 		private void DetailImageScale_Changed(object sender, EventArgs e)
 		{
 			int value = this.scroll_DetailImageScale.Value;
@@ -143,20 +171,24 @@ namespace JakeTest
 		private void UpdateDisplayImage()
 		{
 			m_displayGR.Clear(Color.DarkGray);
-			int mx = m_displayImageX;
-			int my = m_displayImageY;
-			int drawW = (int)((float)(m_displayImageWidth) / m_displayImageDisplayScale);
-			int drawH = (int)((float)(m_displayImageHeight) / m_displayImageDisplayScale);
-			int dx = 0;
-			int dy = 0;
-			int sx = mx;
-			int sy = my;
 			if (m_loadedImage != null) 
 			{
-				m_displayGR.DrawImage(m_loadedImage, 
-			                      	new Rectangle(dx, dy, drawW, drawH),
-			                      	new Rectangle(sx, sy, drawW, drawH),
-			                      	GraphicsUnit.Pixel);
+				int mX = m_displayImageX;
+				int mY = m_displayImageY;
+
+				int dX = 0;
+				int dY = 0;
+				int dW = m_displayImageWidth;
+				int dH = m_displayImageHeight;
+				Rectangle destRect = new Rectangle(dX, dY, dW, dH);
+
+				int sW = (int)((float)(m_displayImageWidth) / m_displayImageDisplayScale);
+				int sH = (int)((float)(m_displayImageHeight) / m_displayImageDisplayScale);
+				int sX = mX;
+				int sY = mY;
+				Rectangle srcRect = new Rectangle(sX, sY, sW, sH);
+
+				m_displayGR.DrawImage(m_loadedImage, destRect, srcRect, GraphicsUnit.Pixel);
 			}
 			picturebox_DisplayImage.Image = m_displayImage;
 		}
