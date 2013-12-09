@@ -31,8 +31,9 @@ namespace JakeTest
 			m_displayImage = new Bitmap(m_displayImageWidth, m_displayImageHeight);
 			m_displayGR = Graphics.FromImage(m_displayImage);
 			m_displayGR.InterpolationMode = InterpolationMode.HighQualityBicubic;
-			UpdateDisplayImage();
+			RefreshDisplayImage();
 
+			m_detailImageTrack = true;
 			m_detailImageX = 0;
 			m_detailImageY = 0;
 			m_detailImageDisplayScale = 2.0f;
@@ -41,7 +42,7 @@ namespace JakeTest
 			m_detailImage = new Bitmap(m_detailImageWidth, m_detailImageHeight);
 			m_detailGR = Graphics.FromImage(m_detailImage);
 			m_detailGR.InterpolationMode = InterpolationMode.HighQualityBicubic;
-			UpdateDetailImage();
+			RefreshDetailImage();
 
 			this.picturebox_DisplayImage.MouseMove += new MouseEventHandler(DisplayImage_MouseMove);
 			this.picturebox_DisplayImage.MouseDown += new MouseEventHandler(DisplayImage_MouseDown);
@@ -78,8 +79,8 @@ namespace JakeTest
 			m_displayImageX = 0;
 			m_displayImageY = 0;
 			m_displayImageDisplayScale = 1.0f;
-			UpdateDisplayImage();
-			UpdateDetailImage();
+			RefreshDisplayImage();
+			RefreshDetailImage();
 
 			SetStatusText(string.Format("Loaded '{0}' {1} x {2}", fileName, m_loadedImageWidth, m_loadedImageHeight));
 		}
@@ -92,6 +93,22 @@ namespace JakeTest
 			this.text_ImageX.Text = m_sourceImagePixelX.ToString();
 			this.text_ImageY.Text = m_sourceImagePixelY.ToString();
 		}
+		private void UpdateDisplayImage (int x, int y)
+		{
+			m_dragX = x;
+			m_dragY = y;
+			RefreshDisplayImage();
+		}
+		private void UpdateDetailImage (int x, int y)
+		{
+			if (m_detailImageTrack)
+			{
+				m_detailImageX = x;
+				m_detailImageY = y;
+				RefreshDetailImage();
+				SetImageXYText();
+			}
+		}
 		private void DisplayImage_MouseMove (object sender, MouseEventArgs e)
 		{
 			int curX = e.Location.X;
@@ -100,45 +117,48 @@ namespace JakeTest
 			{
 				m_displayImageX -= (curX - m_dragX);
 				m_displayImageY -= (curY - m_dragY);
-				m_dragX = curX;
-				m_dragY = curY;
-				UpdateDisplayImage();
+				UpdateDisplayImage(curX, curY);
 			} 
-			else 
+			else if (m_detailImageTrack)
 			{
-				m_detailImageX = curX;
-				m_detailImageY = curY;
-				UpdateDetailImage();
-				SetImageXYText();
+				UpdateDetailImage(curX, curY);
 			}
 			string text = e.Location.ToString();
 			SetStatusText(text);
 		} 
-		private void DisplayImage_MouseDown(object sender, MouseEventArgs e)
+		private void DisplayImage_MouseDown (object sender, MouseEventArgs e)
 		{
-			m_dragging = true;
-			m_dragX = e.Location.X;
-			m_dragY = e.Location.Y;
-			this.Cursor = Cursors.Cross;
-			SetStatusText("Dragging Start " + e.Location.ToString());
+			if (e.Button == MOUSE_BUTTON_DRAG)
+			{
+				m_dragging = true;
+				m_dragX = e.Location.X;
+				m_dragY = e.Location.Y;
+				this.Cursor = Cursors.Cross;
+				SetStatusText("Dragging Start " + e.Location.ToString());
+			}
+			else if (e.Button == MOUSE_BUTTON_DETAIL_LOCK_TOGGLE)
+			{
+			}
 		}
-		private void DisplayImage_MouseUp(object sender, MouseEventArgs e)
+		private void DisplayImage_MouseUp (object sender, MouseEventArgs e)
 		{
-			m_dragging = false;
-			this.Cursor = Cursors.Default;
+			if (e.Button == MOUSE_BUTTON_DRAG)
+			{
+				m_dragging = false;
+				this.Cursor = Cursors.Default;
 
-			int curX = e.Location.X;
-			int curY = e.Location.Y;
+				int curX = e.Location.X;
+				int curY = e.Location.Y;
 
-			m_dragX = curX;
-			m_dragY = curY;
-			UpdateDisplayImage();
+				UpdateDisplayImage(curX, curY);
+				UpdateDetailImage(curX, curY);
 
-			m_detailImageX = curX;
-			m_detailImageY = curY;
-			UpdateDetailImage();
-
-			SetStatusText("Dragging Stop");
+				SetStatusText("Dragging Stop");
+			}
+			else if (e.Button == MOUSE_BUTTON_DETAIL_LOCK_TOGGLE)
+			{
+				m_detailImageTrack ^= true;
+			}
 		}
 		private void DisplayImage_MouseDoubleClick (object sender, MouseEventArgs e)
 		{
@@ -184,10 +204,10 @@ namespace JakeTest
 		{
 			int value = this.scroll_DetailImageScale.Value;
 			m_detailImageDisplayScale = (float)(value);
-			UpdateDetailImage();
+			RefreshDetailImage();
 			SetStatusText("ImageScale:" + value);
 		}
-		private void UpdateDisplayImage()
+		private void RefreshDisplayImage()
 		{
 			m_displayGR.Clear(Color.DarkGray);
 			if (m_loadedImage != null) 
@@ -220,7 +240,7 @@ namespace JakeTest
 			m_sourceImagePixelX = mX;
 			m_sourceImagePixelY = mY;
 		}
-		private void UpdateDetailImage()
+		private void RefreshDetailImage()
 		{
 			ComputeImageXY();
 
@@ -276,8 +296,12 @@ namespace JakeTest
 		private int m_detailImageX;
 		private int m_detailImageY;
 
-		private bool m_dragging;
 		private int m_dragX;
 		private int m_dragY;
+		private bool m_dragging;
+		private bool m_detailImageTrack;
+
+		private MouseButtons MOUSE_BUTTON_DRAG = MouseButtons.Left;
+		private MouseButtons MOUSE_BUTTON_DETAIL_LOCK_TOGGLE = MouseButtons.Right;
 	}
 }
