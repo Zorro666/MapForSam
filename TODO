@@ -1,3 +1,4 @@
-* zoom, unzoom about mouse cursor position
-* mode to lock detail image: key press or mouse (right click)
-* above detail image display locked status
+* mode to lock detail image: key press & button (to show the status)
+* display easting & northing
+* system to calibrate easting & northing
+* system to choose north direction
