@@ -31,6 +31,7 @@ namespace JakeTest
             this.text_ImageX = new System.Windows.Forms.TextBox();
             this.text_ImageY = new System.Windows.Forms.TextBox();
             this.label_ImageY = new System.Windows.Forms.Label();
+            this.button_DetailImageTrack = new System.Windows.Forms.Button();
             this.panel_Top.SuspendLayout();
             // 
             // panel_Top
@@ -50,6 +51,7 @@ namespace JakeTest
             this.button_Quit.Name = "button_Quit";
             this.button_Quit.Location = new System.Drawing.Point(8, 12);
             this.button_Quit.TabIndex = 0;
+            this.button_Quit.Size = new System.Drawing.Size(75, 24);
             this.button_Quit.ImeMode = System.Windows.Forms.ImeMode.Disable;
             this.button_Quit.BackColor = System.Drawing.SystemColors.ControlDark;
             this.button_Quit.Text = "Quit";
@@ -82,6 +84,7 @@ namespace JakeTest
             this.button_LoadImage.Name = "button_LoadImage";
             this.button_LoadImage.Location = new System.Drawing.Point(96, 12);
             this.button_LoadImage.TabIndex = 0;
+            this.button_LoadImage.Size = new System.Drawing.Size(75, 24);
             this.button_LoadImage.ImeMode = System.Windows.Forms.ImeMode.Disable;
             this.button_LoadImage.BackColor = System.Drawing.SystemColors.ControlDark;
             this.button_LoadImage.Text = "Load Image";
@@ -115,7 +118,7 @@ namespace JakeTest
             this.text_Northing.Name = "text_Northing";
             this.text_Northing.ForeColor = System.Drawing.SystemColors.WindowText;
             this.text_Northing.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.text_Northing.Location = new System.Drawing.Point(616, 360);
+            this.text_Northing.Location = new System.Drawing.Point(616, 400);
             this.text_Northing.TabIndex = 4;
             this.text_Northing.Size = new System.Drawing.Size(96, 20);
             this.text_Northing.ReadOnly = true;
@@ -124,7 +127,7 @@ namespace JakeTest
             // label_Northing
             // 
             this.label_Northing.Name = "label_Northing";
-            this.label_Northing.Location = new System.Drawing.Point(552, 360);
+            this.label_Northing.Location = new System.Drawing.Point(552, 400);
             this.label_Northing.Image = null;
             this.label_Northing.TabIndex = 5;
             this.label_Northing.Size = new System.Drawing.Size(56, 20);
@@ -133,7 +136,7 @@ namespace JakeTest
             // label_Easting
             // 
             this.label_Easting.Name = "label_Easting";
-            this.label_Easting.Location = new System.Drawing.Point(552, 328);
+            this.label_Easting.Location = new System.Drawing.Point(552, 368);
             this.label_Easting.Image = null;
             this.label_Easting.TabIndex = 5;
             this.label_Easting.Size = new System.Drawing.Size(56, 20);
@@ -144,7 +147,7 @@ namespace JakeTest
             this.text_Easting.Name = "text_Easting";
             this.text_Easting.ForeColor = System.Drawing.SystemColors.WindowText;
             this.text_Easting.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.text_Easting.Location = new System.Drawing.Point(616, 328);
+            this.text_Easting.Location = new System.Drawing.Point(616, 368);
             this.text_Easting.TabIndex = 4;
             this.text_Easting.Size = new System.Drawing.Size(96, 20);
             this.text_Easting.ReadOnly = true;
@@ -153,7 +156,7 @@ namespace JakeTest
             // label_ImageX
             // 
             this.label_ImageX.Name = "label_ImageX";
-            this.label_ImageX.Location = new System.Drawing.Point(552, 388);
+            this.label_ImageX.Location = new System.Drawing.Point(552, 428);
             this.label_ImageX.Image = null;
             this.label_ImageX.TabIndex = 5;
             this.label_ImageX.Size = new System.Drawing.Size(56, 20);
@@ -164,7 +167,7 @@ namespace JakeTest
             this.text_ImageX.Name = "text_ImageX";
             this.text_ImageX.ForeColor = System.Drawing.SystemColors.WindowText;
             this.text_ImageX.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.text_ImageX.Location = new System.Drawing.Point(616, 388);
+            this.text_ImageX.Location = new System.Drawing.Point(616, 428);
             this.text_ImageX.TabIndex = 4;
             this.text_ImageX.Size = new System.Drawing.Size(96, 20);
             this.text_ImageX.ReadOnly = true;
@@ -175,7 +178,7 @@ namespace JakeTest
             this.text_ImageY.Name = "text_ImageY";
             this.text_ImageY.ForeColor = System.Drawing.SystemColors.WindowText;
             this.text_ImageY.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.text_ImageY.Location = new System.Drawing.Point(616, 420);
+            this.text_ImageY.Location = new System.Drawing.Point(616, 460);
             this.text_ImageY.TabIndex = 4;
             this.text_ImageY.Size = new System.Drawing.Size(96, 20);
             this.text_ImageY.ReadOnly = true;
@@ -184,11 +187,22 @@ namespace JakeTest
             // label_ImageY
             // 
             this.label_ImageY.Name = "label_ImageY";
-            this.label_ImageY.Location = new System.Drawing.Point(552, 418);
+            this.label_ImageY.Location = new System.Drawing.Point(552, 458);
             this.label_ImageY.Image = null;
             this.label_ImageY.TabIndex = 5;
             this.label_ImageY.Size = new System.Drawing.Size(56, 20);
             this.label_ImageY.Text = "Image Y:";
+            // 
+            // button_DetailImageTrack
+            // 
+            this.button_DetailImageTrack.Name = "button_DetailImageTrack";
+            this.button_DetailImageTrack.Location = new System.Drawing.Point(544, 328);
+            this.button_DetailImageTrack.TabIndex = 6;
+            this.button_DetailImageTrack.Size = new System.Drawing.Size(75, 24);
+            this.button_DetailImageTrack.ImeMode = System.Windows.Forms.ImeMode.Disable;
+            this.button_DetailImageTrack.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.button_DetailImageTrack.Text = "Lock";
+            this.button_DetailImageTrack.UseVisualStyleBackColor = true;
             // 
             // JakeTestMain
             // 
@@ -207,6 +221,7 @@ namespace JakeTest
             this.Controls.Add(this.text_ImageX);
             this.Controls.Add(this.text_ImageY);
             this.Controls.Add(this.label_ImageY);
+            this.Controls.Add(this.button_DetailImageTrack);
             this.Text = "Sam's Map Tool";
             this.panel_Top.ResumeLayout(false);
         }
@@ -225,6 +240,7 @@ namespace JakeTest
         private System.Windows.Forms.TextBox text_ImageX;
         private System.Windows.Forms.TextBox text_ImageY;
         private System.Windows.Forms.Label label_ImageY;
+        private System.Windows.Forms.Button button_DetailImageTrack;
     }
     #endregion
 }
