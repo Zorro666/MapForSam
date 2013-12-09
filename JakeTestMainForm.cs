@@ -34,6 +34,8 @@ namespace JakeTest
 			RefreshDisplayImage();
 
 			m_detailImageTrack = true;
+			SetDetailImageTrackButtonState();
+
 			m_detailImageX = 0;
 			m_detailImageY = 0;
 			m_detailImageDisplayScale = 2.0f;
@@ -48,9 +50,14 @@ namespace JakeTest
 			this.picturebox_DisplayImage.MouseDown += new MouseEventHandler(DisplayImage_MouseDown);
 			this.picturebox_DisplayImage.MouseUp += new MouseEventHandler(DisplayImage_MouseUp);
 			this.picturebox_DisplayImage.MouseDoubleClick += new MouseEventHandler(DisplayImage_MouseDoubleClick);
+			this.picturebox_DisplayImage.MouseClick += new MouseEventHandler(DisplayImage_MouseClick);
+
 			this.button_Quit.Click += new EventHandler(Quit_Click);
 			this.button_LoadImage.Click += new EventHandler(LoadFile_Click);
+			this.button_DetailImageTrack.Click += new EventHandler(DetailImageTrack_Click);
+
 			this.scroll_DetailImageScale.ValueChanged += new EventHandler(DetailImageScale_Changed);
+
 
 			this.DoubleBuffered = true;
 		}
@@ -72,6 +79,10 @@ namespace JakeTest
 			ImageLoadFile(openFileDialog1.FileName);
 			m_loadedImageWidth = m_loadedImage.Size.Width;
 			m_loadedImageHeight = m_loadedImage.Size.Height;
+		}
+		private void DetailImageTrack_Click(object sender, EventArgs e)
+		{
+			ToggleDetailImageTrack();
 		}
 		private void ImageLoadFile(string fileName)
 		{
@@ -136,9 +147,6 @@ namespace JakeTest
 				this.Cursor = Cursors.Cross;
 				SetStatusText("Dragging Start " + e.Location.ToString());
 			}
-			else if (e.Button == MOUSE_BUTTON_DETAIL_LOCK_TOGGLE)
-			{
-			}
 		}
 		private void DisplayImage_MouseUp (object sender, MouseEventArgs e)
 		{
@@ -155,12 +163,15 @@ namespace JakeTest
 
 				SetStatusText("Dragging Stop");
 			}
-			else if (e.Button == MOUSE_BUTTON_DETAIL_LOCK_TOGGLE)
+		}
+		private void DisplayImage_MouseClick(object sender, MouseEventArgs e)
+		{
+			if (e.Button == MOUSE_BUTTON_DETAIL_LOCK_TOGGLE)
 			{
-				m_detailImageTrack ^= true;
+				ToggleDetailImageTrack();
 			}
 		}
-		private void DisplayImage_MouseDoubleClick (object sender, MouseEventArgs e)
+		private void DisplayImage_MouseDoubleClick(object sender, MouseEventArgs e)
 		{
 			float displayScale = m_displayImageDisplayScale;
 			SetStatusText("Double-click:" + e.Button);
@@ -198,6 +209,22 @@ namespace JakeTest
 					MessageBox.Show(string.Format("newX != oldX {0} != {1}", newX, oldX));
 				if (newY != oldY)
 					MessageBox.Show(string.Format("newY != oldY {0} != {1}", newY, oldY));
+			}
+		}
+		private void ToggleDetailImageTrack ()
+		{
+			m_detailImageTrack ^= true;
+			SetDetailImageTrackButtonState();
+		}
+		private void SetDetailImageTrackButtonState ()
+		{
+			if (m_detailImageTrack == true)
+			{
+				this.button_DetailImageTrack.Text = "Lock";
+			}
+			else
+			{
+				this.button_DetailImageTrack.Text = "Track";
 			}
 		}
 		private void DetailImageScale_Changed(object sender, EventArgs e)
