@@ -18,10 +18,20 @@ namespace JakeTest
 		}
 		private void Init()
 		{
+			m_listEastingPixels = new List<int>();
+			m_listEastingValues = new List<int>();
+			m_listNorthingPixels = new List<int>();
+			m_listNorthingValues = new List<int>();
+
 			m_loadedImage = null;
 			m_dragging = false;
 			m_dragX = 0;
 			m_dragY = 0;
+
+			m_eastingZero = 0;
+			m_northingZero = 0;
+			m_eastingScale = 1;
+			m_northingScale = 1;
 
 			m_displayImageX = 0;
 			m_displayImageY = 0;
@@ -73,7 +83,7 @@ namespace JakeTest
     	openFileDialog1.FilterIndex = 1 ;
     	openFileDialog1.RestoreDirectory = true ;
 
-    	if(openFileDialog1.ShowDialog() != DialogResult.OK)
+    	if(openFileDialog1.ShowDialog(this) != DialogResult.OK)
 				return;
 
 			ImageLoadFile(openFileDialog1.FileName);
@@ -104,6 +114,80 @@ namespace JakeTest
 			this.text_ImageX.Text = m_sourceImagePixelX.ToString();
 			this.text_ImageY.Text = m_sourceImagePixelY.ToString();
 		}
+		private void ComputeEastingNorthing()
+		{
+			int eastingPixel = m_sourceImagePixelX;
+			int northingPixel = m_sourceImagePixelY;
+			int easting = m_eastingZero + eastingPixel * m_eastingScale;
+			int northing = m_northingZero + northingPixel * m_northingScale;
+			m_easting = easting;
+			m_northing = northing;
+		}
+		private void ComputeBestFit (List<int> xValues, List<int> yValues, ref int A, ref int B)
+		{
+			int nX = xValues.Count;
+			int nY = yValues.Count;
+			if (nX != nY)
+			{
+				A = 0;
+				B = 0;
+				MessageBox.Show(string.Format("nX != nY {0} != {1]", nX, nY));
+				return;
+			}
+			if (nX == 1)
+			{
+				SetStatusText("Need more than one Easting, Northing setting");
+				return;
+			}
+
+			int n = nX;
+			int sumX = 0;
+			int sumY = 0;
+			int sumXY = 0;
+			int sumXX = 0;
+
+			for (int i = 0; i < n; i++)
+			{
+				int x = xValues[i];
+				int y = yValues[i];
+				sumX += x;
+				sumY += y;
+				sumXY = x * y;
+				sumXX = x * x;
+			}
+
+			// y = A * x + B
+			// A = ( n*sum(x*y) - (sum(x)*sum(y))) / (n*sum(x^2) - (sum(x)*sum(x))
+			// B = sum(x^2)*sum(y) - sum(x)*sum(x*y) / (n*sum(x^2) - (sum(x)*sum(x))
+			int denom = ((n * sumXX) - (sumX * sumX));
+			A = ((n * sumXY) - (sumX * sumY)) / denom;
+			B = ((sumXX * sumY) - (sumX * sumXY)) / denom;
+		}
+		private void AddNewEastingNorthing(int newEasting, int newNorthing)
+		{
+			m_listEastingPixels.Add(m_sourceImagePixelX);
+			m_listEastingValues.Add(newEasting);
+
+			int A = 0;
+			int B = 0;
+
+			ComputeBestFit(m_listEastingPixels, m_listEastingValues, ref A, ref B);
+			m_eastingScale = A;
+			m_eastingZero = B;
+
+			m_listNorthingPixels.Add(m_sourceImagePixelY);
+			m_listNorthingValues.Add(newNorthing);
+			ComputeBestFit(m_listNorthingPixels, m_listNorthingValues, ref A, ref B);
+			m_northingScale = A;
+			m_northingZero = B;
+		}
+
+		private void SetEastingNorthingText()
+		{
+			ComputeEastingNorthing();
+			this.text_Easting.Text = m_easting.ToString();
+			this.text_Northing.Text = m_northing.ToString();
+		}
 		private void UpdateDisplayImage (int x, int y)
 		{
 			m_dragX = x;
@@ -118,6 +202,7 @@ namespace JakeTest
 				m_detailImageY = y;
 				RefreshDetailImage();
 				SetImageXYText();
+				SetEastingNorthingText();
 			}
 		}
 		private void DisplayImage_MouseMove (object sender, MouseEventArgs e)
@@ -134,8 +219,12 @@ namespace JakeTest
 			{
 				UpdateDetailImage(curX, curY);
 			}
-			string text = e.Location.ToString();
-			SetStatusText(text);
+			bool debug = false;
+			if (debug)
+			{
+				string text = e.Location.ToString();
+				SetStatusText(text);
+			}
 		} 
 		private void DisplayImage_MouseDown (object sender, MouseEventArgs e)
 		{
@@ -164,14 +253,41 @@ namespace JakeTest
 				SetStatusText("Dragging Stop");
 			}
 		}
-		private void DisplayImage_MouseClick(object sender, MouseEventArgs e)
+		private void DisplayImage_MouseClick (object sender, MouseEventArgs e)
 		{
 			if (e.Button == MOUSE_BUTTON_DETAIL_LOCK_TOGGLE)
 			{
 				ToggleDetailImageTrack();
 			}
+			if ((e.Button == MouseButtons.Left) && (Control.ModifierKeys == Keys.Control))
+			{
+				EnterEastingNorthing();
+			}
 		}
-		private void DisplayImage_MouseDoubleClick(object sender, MouseEventArgs e)
+		private void EnterEastingNorthing ()
+		{
+			EastingNorthingDialog eastingNorthingDialog = new EastingNorthingDialog(m_easting, m_northing);
+			DialogResult result = eastingNorthingDialog.ShowDialog(this);
+			if (result == DialogResult.OK)
+			{
+				if (eastingNorthingDialog.GetOK())
+				{
+					int newEasting = eastingNorthingDialog.GetEasting();
+					int newNorthing = eastingNorthingDialog.GetNorthing();
+					AddNewEastingNorthing(newEasting, newNorthing);
+					SetStatusText(string.Format("Easting Northing Dialog: Added {0}, {1}", newEasting, newNorthing));
+				}
+				else
+				{
+					SetStatusText("Easting Northing Dialog: Invalid Values");
+				}
+			}
+			else
+			{
+				SetStatusText("Easting Northing Dialog: Cancelled");
+			}
+		}
+		private void DisplayImage_MouseDoubleClick (object sender, MouseEventArgs e)
 		{
 			float displayScale = m_displayImageDisplayScale;
 			SetStatusText("Double-click:" + e.Button);
@@ -180,17 +296,36 @@ namespace JakeTest
 			{
 				zoomAmount = 1.0f;
 			}
-			else if (e.Button == MouseButtons.Right)
-			{
-				zoomAmount = -1.0f;
-			}
 			if (Control.ModifierKeys == Keys.Shift)
 			{
 				zoomAmount *= -1.0f;
 			}
+			bool invert = false;
+			if (displayScale < 1.0f)
+			{
+				invert = true;
+				displayScale = 1.0f / displayScale;
+				zoomAmount *= -1.0f;
+			}
 			displayScale += zoomAmount;
+			if (displayScale == 0.0f)
+			{
+				if (invert)
+				{
+					displayScale = 1.0f;
+				}
+				else
+				{
+					invert = true;
+					displayScale = 2.0f;
+				}
+			}
 			displayScale = Math.Max(displayScale, 1.0f);
 			displayScale = Math.Min(displayScale, 10.0f);
+			if (invert)
+			{
+				displayScale = 1.0f/displayScale;
+			}
 			if (displayScale != m_displayImageDisplayScale)
 			{
 				ComputeImageXY();
@@ -203,12 +338,14 @@ namespace JakeTest
 				SetStatusText("ImageDisplayScale:" + m_displayImageDisplayScale);
 				ComputeImageXY();
 
+/*
 				int newX = m_sourceImagePixelX;
 				int newY = m_sourceImagePixelY;
 				if (newX != oldX)
 					MessageBox.Show(string.Format("newX != oldX {0} != {1}", newX, oldX));
 				if (newY != oldY)
 					MessageBox.Show(string.Format("newY != oldY {0} != {1}", newY, oldY));
+*/
 			}
 		}
 		private void ToggleDetailImageTrack ()
@@ -328,7 +465,19 @@ namespace JakeTest
 		private bool m_dragging;
 		private bool m_detailImageTrack;
 
+		private int m_easting;
+		private int m_northing;
+		private int m_eastingZero;
+		private int m_northingZero;
+		private int m_eastingScale;
+		private int m_northingScale;
 		private MouseButtons MOUSE_BUTTON_DRAG = MouseButtons.Left;
 		private MouseButtons MOUSE_BUTTON_DETAIL_LOCK_TOGGLE = MouseButtons.Right;
+
+		private List<int> m_listEastingPixels;
+		private List<int> m_listEastingValues;
+
+		private List<int> m_listNorthingPixels;
+		private List<int> m_listNorthingValues;
 	}
 }

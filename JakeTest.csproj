@@ -42,5 +42,7 @@
     <Compile Include="Main.cs" />
     <Compile Include="JakeTestMainForm.Designer.cs" />
     <Compile Include="JakeTestMainForm.cs" />
+    <Compile Include="EastingNorthingDialog.cs" />
+    <Compile Include="EastingNorthingDialog.Designer.cs" />
   </ItemGroup>
 </Project>
