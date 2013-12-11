@@ -1,4 +1,5 @@
-* display easting & northing
-* system to calibrate easting & northing
+* test easting, northing entry with real map data
+* system to enter scale value, lock the scale values
+* system to enter origin value, lock the origin values
 * system to choose north direction
 * keyboard shortcuts: zoom in/out, toggle tracking
