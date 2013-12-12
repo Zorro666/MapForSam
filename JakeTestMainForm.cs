@@ -146,7 +146,7 @@ namespace JakeTest
 				sumY.Add(eastingNorthing.X, eastingNorthing.Y);
 
 				sumXY.Add(pixel.X * eastingNorthing.X, pixel.Y * eastingNorthing.Y);
-				sumXX.Add(pixel.X * pixel.X, eastingNorthing.Y * eastingNorthing.Y);
+				sumXX.Add(pixel.X * pixel.X, pixel.Y * pixel.Y);
 			}
 
 			// y = A * x + B
@@ -162,9 +162,9 @@ namespace JakeTest
 			m_eastingScale = (sumXY.X - (sumX.X * sumY.X)/n) / denom;
 			m_eastingZero = ((sumY.X - m_eastingScale * sumX.X)) / n;
 
-			denom = ((n * sumXX.Y) - (sumX.Y * sumX.Y));
-			m_northingScale = ((n * sumXY.Y) - (sumX.Y * sumY.Y)) / denom;
-			m_northingZero = ((sumXX.Y * sumY.Y) - (sumX.Y * sumXY.Y)) / denom;
+			denom = (sumXX.Y - (sumX.Y * sumX.Y)/n);
+			m_northingScale = (sumXY.Y - (sumX.Y * sumY.Y)/n) / denom;
+			m_northingZero = ((sumY.Y - m_northingScale * sumX.Y)) / n;
 		}
 		private void AddNewEastingNorthing(int newEasting, int newNorthing)
 		{
