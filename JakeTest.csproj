@@ -44,5 +44,7 @@
     <Compile Include="JakeTestMainForm.cs" />
     <Compile Include="EastingNorthingDialog.cs" />
     <Compile Include="EastingNorthingDialog.Designer.cs" />
+    <Compile Include="EastingNorthingPoint.cs" />
+    <Compile Include="Vector2.cs" />
   </ItemGroup>
 </Project>

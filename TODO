@@ -1,4 +1,7 @@
+* use list of structure of points internally and find the current point and update its values
+* dialog starts with current easting & northing values
 * test easting, northing entry with real map data
+* edit easting & northing entries directly without using the dialog: button
 * system to enter scale value, lock the scale values
 * system to enter origin value, lock the origin values
 * system to choose north direction

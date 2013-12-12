@@ -16,20 +16,24 @@ namespace JakeTest
       m_easting = easting;
       m_northing = northing;
       InitializeComponent();
+
 		  this.button_OK.Click += new EventHandler(OK_Click);
       this.button_Cancel.Click += new EventHandler(Cancel_Click);
+
+			this.text_Easting.Text = m_easting.ToString();
+			this.text_Northing.Text = m_northing.ToString();
     }
-    public bool GetOK()
-    {
-      return m_ok;
+    public bool OK
+		{
+			get { return m_ok; }
     }
-    public int GetEasting()
-    {
-      return m_easting;
+    public int Easting
+		{
+			get { return m_easting; }
     }
-    public int GetNorthing()
-    {
-      return m_northing;
+    public int Northing
+		{
+			get { return m_northing; }
     }
 		private void Reset()
 		{

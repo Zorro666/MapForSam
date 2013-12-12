@@ -18,10 +18,7 @@ namespace JakeTest
 		}
 		private void Init()
 		{
-			m_listEastingPixels = new List<int>();
-			m_listEastingValues = new List<int>();
-			m_listNorthingPixels = new List<int>();
-			m_listNorthingValues = new List<int>();
+			m_points = new List<EastingNorthingPoint>();
 
 			m_loadedImage = null;
 			m_dragging = false;
@@ -123,63 +120,67 @@ namespace JakeTest
 			m_easting = easting;
 			m_northing = northing;
 		}
-		private void ComputeBestFit (List<int> xValues, List<int> yValues, ref int A, ref int B)
+		private void ComputeBestFitEastingNorthing()
 		{
-			int nX = xValues.Count;
-			int nY = yValues.Count;
-			if (nX != nY)
-			{
-				A = 0;
-				B = 0;
-				MessageBox.Show(string.Format("nX != nY {0} != {1]", nX, nY));
-				return;
-			}
-			if (nX == 1)
+			int n = m_points.Count;
+			if (n == 1)
 			{
 				SetStatusText("Need more than one Easting, Northing setting");
 				return;
 			}
 
-			int n = nX;
-			int sumX = 0;
-			int sumY = 0;
-			int sumXY = 0;
-			int sumXX = 0;
+			Vector2 sumX = new Vector2(0, 0);
+			Vector2 sumY = new Vector2(0, 0);
+			Vector2 sumXY = new Vector2(0, 0);
+			Vector2 sumXX = new Vector2(0, 0);
 
 			for (int i = 0; i < n; i++)
 			{
-				int x = xValues[i];
-				int y = yValues[i];
-				sumX += x;
-				sumY += y;
-				sumXY = x * y;
-				sumXX = x * x;
+				EastingNorthingPoint point = m_points[i];
+				Vector2 pixel = point.Pixel;
+				Vector2 eastingNorthing = point.EastingNorthing;
+
+				sumX.Add(pixel.X, eastingNorthing.X);
+				sumY.Add(pixel.Y, eastingNorthing.Y);
+
+				sumXY.Add(pixel.X * pixel.Y, eastingNorthing.X * eastingNorthing.Y);
+				sumXX.Add(pixel.X * pixel.X, eastingNorthing.X * eastingNorthing.X);
 			}
 
 			// y = A * x + B
 			// A = ( n*sum(x*y) - (sum(x)*sum(y))) / (n*sum(x^2) - (sum(x)*sum(x))
 			// B = sum(x^2)*sum(y) - sum(x)*sum(x*y) / (n*sum(x^2) - (sum(x)*sum(x))
-			int denom = ((n * sumXX) - (sumX * sumX));
-			A = ((n * sumXY) - (sumX * sumY)) / denom;
-			B = ((sumXX * sumY) - (sumX * sumXY)) / denom;
+			int denom;
+
+			denom = ((n * sumXX.X) - (sumX.X * sumX.X));
+			m_eastingScale = ((n * sumXY.X) - (sumX.X * sumY.X)) / denom;
+			m_eastingZero = ((sumXX.X * sumY.X) - (sumX.X * sumXY.X)) / denom;
+
+			denom = ((n * sumXX.Y) - (sumX.Y * sumX.Y));
+			m_northingScale = ((n * sumXY.Y) - (sumX.Y * sumY.Y)) / denom;
+			m_northingZero = ((sumXX.Y * sumY.Y) - (sumX.Y * sumXY.Y)) / denom;
 		}
 		private void AddNewEastingNorthing(int newEasting, int newNorthing)
 		{
-			m_listEastingPixels.Add(m_sourceImagePixelX);
-			m_listEastingValues.Add(newEasting);
+			EastingNorthingPoint newPoint = new EastingNorthingPoint(newEasting, newNorthing, m_sourceImagePixelX, m_sourceImagePixelY);
+			bool found = false;
+			foreach (EastingNorthingPoint point in m_points)
+			{
+				if (point.PixelSame(newPoint))
+				{
+					point.EastingNorthing.X = newEasting;
+					point.EastingNorthing.Y = newNorthing;
+					found = true;
+					MessageBox.Show("Found it");
+					break;
+				}
+			}
+			if (found == false)
+			{
+				m_points.Add(newPoint);
+			}
 
-			int A = 0;
-			int B = 0;
-
-			ComputeBestFit(m_listEastingPixels, m_listEastingValues, ref A, ref B);
-			m_eastingScale = A;
-			m_eastingZero = B;
-
-			m_listNorthingPixels.Add(m_sourceImagePixelY);
-			m_listNorthingValues.Add(newNorthing);
-			ComputeBestFit(m_listNorthingPixels, m_listNorthingValues, ref A, ref B);
-			m_northingScale = A;
-			m_northingZero = B;
+			ComputeBestFitEastingNorthing();
 		}
 
 		private void SetEastingNorthingText()
@@ -270,10 +271,10 @@ namespace JakeTest
 			DialogResult result = eastingNorthingDialog.ShowDialog(this);
 			if (result == DialogResult.OK)
 			{
-				if (eastingNorthingDialog.GetOK())
+				if (eastingNorthingDialog.OK)
 				{
-					int newEasting = eastingNorthingDialog.GetEasting();
-					int newNorthing = eastingNorthingDialog.GetNorthing();
+					int newEasting = eastingNorthingDialog.Easting;
+					int newNorthing = eastingNorthingDialog.Northing;
 					AddNewEastingNorthing(newEasting, newNorthing);
 					SetStatusText(string.Format("Easting Northing Dialog: Added {0}, {1}", newEasting, newNorthing));
 				}
@@ -474,10 +475,6 @@ namespace JakeTest
 		private MouseButtons MOUSE_BUTTON_DRAG = MouseButtons.Left;
 		private MouseButtons MOUSE_BUTTON_DETAIL_LOCK_TOGGLE = MouseButtons.Right;
 
-		private List<int> m_listEastingPixels;
-		private List<int> m_listEastingValues;
-
-		private List<int> m_listNorthingPixels;
-		private List<int> m_listNorthingValues;
+		private List<EastingNorthingPoint> m_points;
 	}
 }
