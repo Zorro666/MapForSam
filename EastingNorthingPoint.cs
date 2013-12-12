@@ -9,7 +9,7 @@ namespace JakeTest
 			m_pixel = new Vector2();
 			m_eastingNorthing = new Vector2();
 		}
-		public EastingNorthingPoint(int easting, int northing, int pixelX, int pixelY)
+		public EastingNorthingPoint(long easting, long northing, long pixelX, long pixelY)
 		{
 			m_pixel = new Vector2(pixelX, pixelY);
 			m_eastingNorthing = new Vector2(easting, northing);
