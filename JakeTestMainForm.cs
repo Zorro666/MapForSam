@@ -113,12 +113,12 @@ namespace JakeTest
 		}
 		private void ComputeEastingNorthing()
 		{
-			int eastingPixel = m_sourceImagePixelX;
-			int northingPixel = m_sourceImagePixelY;
-			int easting = m_eastingZero + eastingPixel * m_eastingScale;
-			int northing = m_northingZero + northingPixel * m_northingScale;
-			m_easting = easting;
-			m_northing = northing;
+			float eastingPixel = m_sourceImagePixelX;
+			float northingPixel = m_sourceImagePixelY;
+			float easting = m_eastingZero + eastingPixel * m_eastingScale;
+			float northing = m_northingZero + northingPixel * m_northingScale;
+			m_easting = (int)Math.Round(easting);
+			m_northing = (int)Math.Round(northing);
 		}
 		private void ComputeBestFitEastingNorthing()
 		{
@@ -140,21 +140,27 @@ namespace JakeTest
 				Vector2 pixel = point.Pixel;
 				Vector2 eastingNorthing = point.EastingNorthing;
 
-				sumX.Add(pixel.X, eastingNorthing.X);
-				sumY.Add(pixel.Y, eastingNorthing.Y);
+				// X = pixel
+				// Y = eastingNorthing
+				sumX.Add(pixel.X, pixel.Y);
+				sumY.Add(eastingNorthing.X, eastingNorthing.Y);
 
-				sumXY.Add(pixel.X * pixel.Y, eastingNorthing.X * eastingNorthing.Y);
-				sumXX.Add(pixel.X * pixel.X, eastingNorthing.X * eastingNorthing.X);
+				sumXY.Add(pixel.X * eastingNorthing.X, pixel.Y * eastingNorthing.Y);
+				sumXX.Add(pixel.X * pixel.X, eastingNorthing.Y * eastingNorthing.Y);
 			}
 
 			// y = A * x + B
 			// A = ( n*sum(x*y) - (sum(x)*sum(y))) / (n*sum(x^2) - (sum(x)*sum(x))
 			// B = sum(x^2)*sum(y) - sum(x)*sum(x*y) / (n*sum(x^2) - (sum(x)*sum(x))
-			int denom;
 
-			denom = ((n * sumXX.X) - (sumX.X * sumX.X));
-			m_eastingScale = ((n * sumXY.X) - (sumX.X * sumY.X)) / denom;
-			m_eastingZero = ((sumXX.X * sumY.X) - (sumX.X * sumXY.X)) / denom;
+			// A = (sum(x*y) - (sum(x)*sum(y))/n) / (sum(x^2) - sum(x)*sum(x)/n)
+			// B = sum(y)/n - A*(sum(x)/n)
+
+			float denom;
+
+			denom = (sumXX.X - (sumX.X * sumX.X)/n);
+			m_eastingScale = (sumXY.X - (sumX.X * sumY.X)/n) / denom;
+			m_eastingZero = ((sumY.X - m_eastingScale * sumX.X)) / n;
 
 			denom = ((n * sumXX.Y) - (sumX.Y * sumX.Y));
 			m_northingScale = ((n * sumXY.Y) - (sumX.Y * sumY.Y)) / denom;
@@ -468,10 +474,10 @@ namespace JakeTest
 
 		private int m_easting;
 		private int m_northing;
-		private int m_eastingZero;
-		private int m_northingZero;
-		private int m_eastingScale;
-		private int m_northingScale;
+		private float m_eastingZero;
+		private float m_northingZero;
+		private float m_eastingScale;
+		private float m_northingScale;
 		private MouseButtons MOUSE_BUTTON_DRAG = MouseButtons.Left;
 		private MouseButtons MOUSE_BUTTON_DETAIL_LOCK_TOGGLE = MouseButtons.Right;
 
