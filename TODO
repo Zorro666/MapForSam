@@ -1,4 +1,3 @@
-* test easting, northing entry with real map data
 * fix click & double-click by handling mouse down/up and using a timer
 * edit easting & northing entries directly without using the dialog 
 * have a button to update new easting+northing values
@@ -6,3 +5,6 @@
 * system to enter origin value, lock the origin values
 * system to choose north direction
 * keyboard shortcuts: zoom in/out, toggle tracking
+
+* Bredon Hill / Empress junction = 434638, 335093
+* Mount Carmell / St. Chads Road = 434881, 335051
