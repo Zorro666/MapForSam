@@ -1,9 +1,7 @@
-* fix click & double-click by handling mouse down/up and using a timer
-* edit easting & northing entries directly without using the dialog 
-* have a button to update new easting+northing values
+* edit easting & northing entries directly without using the dialog + button to commit the new values
+* system to choose north direction
 * system to enter scale value, lock the scale values
 * system to enter origin value, lock the origin values
-* system to choose north direction
 * keyboard shortcuts: zoom in/out, toggle tracking
 
 * Bredon Hill / Empress junction = 434638, 335093

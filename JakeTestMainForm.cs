@@ -18,7 +18,16 @@ namespace JakeTest
 		}
 		private void Init()
 		{
+			m_displayPoints = false;
+			SetDrawPointsButtonState();
+
+			m_now = DateTime.Now;
+    	m_clickTimer = new Timer();
+			m_clickTimer.Interval = 10;
+			m_clickTimer.Tick += new EventHandler(ClickTimer_Tick);
 			m_points = new List<EastingNorthingPoint>();
+			m_clickMouseEventArgs = new MouseEventArgs(MouseButtons.None, 0, 0, 0, 0);
+			m_downMouseEventArgs = new MouseEventArgs(MouseButtons.None, 0, 0, 0, 0);
 
 			m_loadedImage = null;
 			m_dragging = false;
@@ -56,15 +65,17 @@ namespace JakeTest
 			this.picturebox_DisplayImage.MouseMove += new MouseEventHandler(DisplayImage_MouseMove);
 			this.picturebox_DisplayImage.MouseDown += new MouseEventHandler(DisplayImage_MouseDown);
 			this.picturebox_DisplayImage.MouseUp += new MouseEventHandler(DisplayImage_MouseUp);
-			this.picturebox_DisplayImage.MouseDoubleClick += new MouseEventHandler(DisplayImage_MouseDoubleClick);
 			this.picturebox_DisplayImage.MouseClick += new MouseEventHandler(DisplayImage_MouseClick);
+			this.picturebox_DisplayImage.MouseDoubleClick += new MouseEventHandler(DisplayImage_MouseDoubleClick);
+
+			this.KeyPress += new KeyPressEventHandler(this_KeyPress);
 
 			this.button_Quit.Click += new EventHandler(Quit_Click);
 			this.button_LoadImage.Click += new EventHandler(LoadFile_Click);
 			this.button_DetailImageTrack.Click += new EventHandler(DetailImageTrack_Click);
+			this.button_DrawPoints.Click += new EventHandler(DrawPoints_Click);
 
 			this.scroll_DetailImageScale.ValueChanged += new EventHandler(DetailImageScale_Changed);
-
 
 			this.DoubleBuffered = true;
 		}
@@ -87,6 +98,10 @@ namespace JakeTest
 			m_loadedImageWidth = m_loadedImage.Size.Width;
 			m_loadedImageHeight = m_loadedImage.Size.Height;
 		}
+		private void DrawPoints_Click(object sender, EventArgs e)
+		{
+			ToggleDrawPoints();
+		}
 		private void DetailImageTrack_Click(object sender, EventArgs e)
 		{
 			ToggleDetailImageTrack();
@@ -97,10 +112,14 @@ namespace JakeTest
 			m_displayImageX = 0;
 			m_displayImageY = 0;
 			m_displayImageDisplayScale = 1.0f;
-			RefreshDisplayImage();
-			RefreshDetailImage();
+			RefreshImages();
 
 			SetStatusText(string.Format("Loaded '{0}' {1} x {2}", fileName, m_loadedImageWidth, m_loadedImageHeight));
+		}
+		private void RefreshImages()
+		{
+			RefreshDisplayImage();
+			RefreshDetailImage();
 		}
 		private void SetStatusText(string status)
 		{
@@ -187,6 +206,7 @@ namespace JakeTest
 			}
 
 			ComputeBestFitEastingNorthing();
+			RefreshImages();
 		}
 
 		private void SetEastingNorthingText()
@@ -195,13 +215,13 @@ namespace JakeTest
 			this.text_Easting.Text = m_easting.ToString();
 			this.text_Northing.Text = m_northing.ToString();
 		}
-		private void UpdateDisplayImage (int x, int y)
+		private void UpdateDisplayImage(int x, int y)
 		{
 			m_dragX = x;
 			m_dragY = y;
 			RefreshDisplayImage();
 		}
-		private void UpdateDetailImage (int x, int y)
+		private void UpdateDetailImage(int x, int y)
 		{
 			if (m_detailImageTrack)
 			{
@@ -212,7 +232,7 @@ namespace JakeTest
 				SetEastingNorthingText();
 			}
 		}
-		private void DisplayImage_MouseMove (object sender, MouseEventArgs e)
+		private void DisplayImage_MouseMove(object sender, MouseEventArgs e)
 		{
 			int curX = e.Location.X;
 			int curY = e.Location.Y;
@@ -233,68 +253,22 @@ namespace JakeTest
 				SetStatusText(text);
 			}
 		} 
-		private void DisplayImage_MouseDown (object sender, MouseEventArgs e)
-		{
-			if (e.Button == MOUSE_BUTTON_DRAG)
-			{
-				m_dragging = true;
-				m_dragX = e.Location.X;
-				m_dragY = e.Location.Y;
-				this.Cursor = Cursors.Cross;
-				SetStatusText("Dragging Start " + e.Location.ToString());
-			}
-		}
-		private void DisplayImage_MouseUp (object sender, MouseEventArgs e)
-		{
-			if (e.Button == MOUSE_BUTTON_DRAG)
-			{
-				m_dragging = false;
-				this.Cursor = Cursors.Default;
-
-				int curX = e.Location.X;
-				int curY = e.Location.Y;
-
-				UpdateDisplayImage(curX, curY);
-				UpdateDetailImage(curX, curY);
-
-				SetStatusText("Dragging Stop");
-			}
-		}
-		private void DisplayImage_MouseClick (object sender, MouseEventArgs e)
+		private void DisplayImage_SingleClick(MouseEventArgs e)
 		{
 			if (e.Button == MOUSE_BUTTON_DETAIL_LOCK_TOGGLE)
 			{
 				ToggleDetailImageTrack();
 			}
-			if ((e.Button == MouseButtons.Left) && (Control.ModifierKeys == Keys.Control))
+			if (e.Button == MOUSE_BUTTON_ENTER_EASTING_NORTHING)
+			{
+				EnterEastingNorthing();
+			}
+			if ((e.Button == MOUSE_BUTTON_ENTER_EASTING_NORTHING) && (Control.ModifierKeys == Keys.Control))
 			{
 				EnterEastingNorthing();
 			}
 		}
-		private void EnterEastingNorthing ()
-		{
-			EastingNorthingDialog eastingNorthingDialog = new EastingNorthingDialog(m_easting, m_northing);
-			DialogResult result = eastingNorthingDialog.ShowDialog(this);
-			if (result == DialogResult.OK)
-			{
-				if (eastingNorthingDialog.OK)
-				{
-					int newEasting = eastingNorthingDialog.Easting;
-					int newNorthing = eastingNorthingDialog.Northing;
-					AddNewEastingNorthing(newEasting, newNorthing);
-					SetStatusText(string.Format("Easting Northing Dialog: Added {0}, {1}", newEasting, newNorthing));
-				}
-				else
-				{
-					SetStatusText("Easting Northing Dialog: Invalid Values");
-				}
-			}
-			else
-			{
-				SetStatusText("Easting Northing Dialog: Cancelled");
-			}
-		}
-		private void DisplayImage_MouseDoubleClick (object sender, MouseEventArgs e)
+		private void DisplayImage_DoubleClick(MouseEventArgs e)
 		{
 			float displayScale = m_displayImageDisplayScale;
 			SetStatusText("Double-click:" + e.Button);
@@ -302,6 +276,10 @@ namespace JakeTest
 			if (e.Button == MouseButtons.Left)
 			{
 				zoomAmount = 1.0f;
+			}
+			else if (e.Button == MouseButtons.Right)
+			{
+				zoomAmount = -1.0f;
 			}
 			if (Control.ModifierKeys == Keys.Shift)
 			{
@@ -353,14 +331,146 @@ namespace JakeTest
 				if (newY != oldY)
 					MessageBox.Show(string.Format("newY != oldY {0} != {1}", newY, oldY));
 */
+				RefreshDisplayImage();
 			}
 		}
-		private void ToggleDetailImageTrack ()
+		private void ClickTimer_Tick(object sender, EventArgs e)
+		{
+			DateTime now = DateTime.Now;
+			m_clickTimerMS += (now - m_now).Milliseconds;
+			m_now = now;
+
+			if (m_clickTimerMS >= SystemInformation.DoubleClickTime)
+			{
+				if (m_numClicks == 1)
+				{
+					DisplayImage_SingleClick(m_clickMouseEventArgs);
+				}
+				m_clickTimer.Stop();
+				m_clickTimerMS = 0;
+				m_numClicks = 0;
+			}
+		}
+		private void DisplayImage_MouseDown(object sender, MouseEventArgs e)
+		{
+			if (e.Button == MOUSE_BUTTON_DRAG)
+			{
+				m_dragging = true;
+				m_dragX = e.Location.X;
+				m_dragY = e.Location.Y;
+				this.Cursor = Cursors.Cross;
+				SetStatusText("Dragging Start " + e.Location.ToString());
+			}
+			m_downMouseEventArgs = e;
+		}
+		private void DisplayImage_MouseUp(object sender, MouseEventArgs e)
+		{
+			if (e.Button == MOUSE_BUTTON_DRAG)
+			{
+				m_dragging = false;
+				this.Cursor = Cursors.Default;
+
+				int curX = e.Location.X;
+				int curY = e.Location.Y;
+
+				UpdateDisplayImage(curX, curY);
+				UpdateDetailImage(curX, curY);
+
+				SetStatusText("Dragging Stop");
+			}
+		}
+		private void DisplayImage_MouseClick(object sender, MouseEventArgs e)
+		{
+			if (m_numClicks == 0)
+			{
+				bool validClick = true;
+				if (m_downMouseEventArgs.Button != e.Button)
+				{
+					validClick = false;
+				}
+				if (m_downMouseEventArgs.Location != e.Location)
+				{
+					validClick = false;
+				}
+				if (validClick)
+				{
+					m_clickTimer.Start();
+					m_numClicks = 1;
+					m_now = DateTime.Now;
+					m_clickTimerMS = 0;
+					m_clickMouseEventArgs = e;
+				}
+			}
+			else
+			{
+				m_numClicks += 1;
+			}
+		}
+		private void DisplayImage_MouseDoubleClick(object sender, MouseEventArgs e)
+		{
+			m_clickTimer.Stop();
+			m_clickTimerMS = 0;
+			m_numClicks = 0;
+			DisplayImage_DoubleClick(e);
+		}
+		private void EnterEastingNorthing()
+		{
+			EastingNorthingDialog eastingNorthingDialog = new EastingNorthingDialog(m_easting, m_northing);
+			DialogResult result = eastingNorthingDialog.ShowDialog(this);
+			if (result == DialogResult.OK)
+			{
+				if (eastingNorthingDialog.OK)
+				{
+					int newEasting = eastingNorthingDialog.Easting;
+					int newNorthing = eastingNorthingDialog.Northing;
+					AddNewEastingNorthing(newEasting, newNorthing);
+					SetStatusText(string.Format("Easting Northing Dialog: Added {0}, {1}", newEasting, newNorthing));
+				}
+				else
+				{
+					SetStatusText("Easting Northing Dialog: Invalid Values");
+				}
+			}
+			else
+			{
+				SetStatusText("Easting Northing Dialog: Cancelled");
+			}
+		}
+		private void this_KeyPress(object sender, KeyPressEventArgs k)
+		{
+			Rectangle screenRect = this.picturebox_DisplayImage.RectangleToScreen(this.picturebox_DisplayImage.ClientRectangle);
+			if (screenRect.Contains(Control.MousePosition))
+			{
+				if (k.KeyChar == 'p')
+				{
+					ToggleDrawPoints();
+				}
+			}
+		}
+		private void ToggleDrawPoints()
+		{
+			m_displayPoints ^= true;
+			SetDrawPointsButtonState();
+			RefreshImages();
+			SetStatusText(string.Format("DisplayPoints:{0}", m_displayPoints));
+		}
+		private void SetDrawPointsButtonState()
+		{
+			if (m_displayPoints == true)
+			{
+				this.button_DrawPoints.Text = "Hide Points";
+			}
+			else
+			{
+				this.button_DrawPoints.Text = "Draw Points";
+			}
+		}
+		private void ToggleDetailImageTrack()
 		{
 			m_detailImageTrack ^= true;
 			SetDetailImageTrackButtonState();
 		}
-		private void SetDetailImageTrackButtonState ()
+		private void SetDetailImageTrackButtonState()
 		{
 			if (m_detailImageTrack == true)
 			{
@@ -381,11 +491,13 @@ namespace JakeTest
 		private void RefreshDisplayImage()
 		{
 			m_displayGR.Clear(Color.DarkGray);
-			if (m_loadedImage != null) 
-			{
-				int mX = m_displayImageX;
-				int mY = m_displayImageY;
+			int mX = m_displayImageX;
+			int mY = m_displayImageY;
+			int sX = (int)((float)(mX) / m_displayImageDisplayScale);
+			int sY = (int)((float)(mY) / m_displayImageDisplayScale);
 
+			if (m_loadedImage != null)
+			{
 				int dX = 0;
 				int dY = 0;
 				int dW = m_displayImageWidth;
@@ -394,13 +506,33 @@ namespace JakeTest
 
 				int sW = (int)((float)(m_displayImageWidth) / m_displayImageDisplayScale);
 				int sH = (int)((float)(m_displayImageHeight) / m_displayImageDisplayScale);
-				int sX = (int)((float)(mX) / m_displayImageDisplayScale);
-				int sY = (int)((float)(mY) / m_displayImageDisplayScale);
 				Rectangle srcRect = new Rectangle(sX, sY, sW, sH);
 
 				m_displayGR.DrawImage(m_loadedImage, destRect, srcRect, GraphicsUnit.Pixel);
 			}
+			if (m_displayPoints)
+			{
+				int pointWidth = 10;
+				int pointHeight = 10;
+				DrawPoints(m_displayGR, pointWidth, pointHeight, sX, sY, 1.0f/m_displayImageDisplayScale);
+			}
 			picturebox_DisplayImage.Image = m_displayImage;
+		}
+		private void DrawPoints(Graphics gr, int pointWidth, int pointHeight, int x0, int y0, float scale)
+		{
+			Pen pointColour = Pens.Yellow;
+			int n = m_points.Count;
+			for (int i = 0; i < n; i++)
+			{
+				EastingNorthingPoint point = m_points[i];
+				Vector2 pixel = point.Pixel;
+
+				int x = (int)((float)(pixel.X - x0) / scale);
+				int y = (int)((float)(pixel.Y - y0) / scale);
+				gr.DrawRectangle(pointColour, x, y, pointWidth, pointHeight);
+				gr.DrawLine(pointColour, x, y, x + pointWidth, y + pointHeight);
+				gr.DrawLine(pointColour, x, y + pointHeight, x + pointWidth, y);
+			}
 		}
 		private void ComputeImageXY()
 		{
@@ -418,19 +550,26 @@ namespace JakeTest
 			m_detailGR.Clear(Color.DarkGray);
 			int dW = m_detailImageWidth;
 			int dH = m_detailImageHeight;
+			int sW = (int)((float)(m_detailImageWidth) / (float)m_detailImageDisplayScale);
+			int sH = (int)((float)(m_detailImageHeight) / (float)m_detailImageDisplayScale);
+			int sX = m_sourceImagePixelX - (sW / 2);
+			int sY = m_sourceImagePixelY - (sH / 2);
 			if (m_loadedImage != null) 
 			{
 				int dX = 0;
 				int dY = 0;
 				Rectangle destRect = new Rectangle(dX, dY, dW, dH);
 
-				int sW = (int)((float)(m_detailImageWidth) / m_detailImageDisplayScale);
-				int sH = (int)((float)(m_detailImageHeight) / m_detailImageDisplayScale);
-				int sX = m_sourceImagePixelX - (sW / 2);
-				int sY = m_sourceImagePixelY - (sH / 2);
 				Rectangle srcRect = new Rectangle(sX, sY, sW, sH);
 
 				m_detailGR.DrawImage(m_loadedImage, destRect, srcRect, GraphicsUnit.Pixel);
+			}
+
+			if (m_displayPoints)
+			{
+				int pointWidth = 10;
+				int pointHeight = 10;
+				DrawPoints(m_detailGR, pointWidth, pointHeight, sX, sY, 1.0f/m_detailImageDisplayScale);
 			}
 
 			int halfW = dW / 2;
@@ -479,8 +618,16 @@ namespace JakeTest
 		private float m_eastingScale;
 		private float m_northingScale;
 		private MouseButtons MOUSE_BUTTON_DRAG = MouseButtons.Left;
+		private MouseButtons MOUSE_BUTTON_ENTER_EASTING_NORTHING = MouseButtons.Left;
 		private MouseButtons MOUSE_BUTTON_DETAIL_LOCK_TOGGLE = MouseButtons.Right;
 
+		private Timer m_clickTimer;
 		private List<EastingNorthingPoint> m_points;
+		private int m_clickTimerMS;
+		private int m_numClicks = 0;
+		private DateTime m_now;
+		private MouseEventArgs m_clickMouseEventArgs;
+		private MouseEventArgs m_downMouseEventArgs;
+		private bool m_displayPoints;
 	}
 }
