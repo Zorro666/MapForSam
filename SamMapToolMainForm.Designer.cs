@@ -27,13 +27,19 @@ namespace SamMapTool
             this.label_Northing = new System.Windows.Forms.Label();
             this.label_Easting = new System.Windows.Forms.Label();
             this.text_Easting = new System.Windows.Forms.TextBox();
-            this.label_ImageX = new System.Windows.Forms.Label();
+            this.label_Origin = new System.Windows.Forms.Label();
             this.text_ImageX = new System.Windows.Forms.TextBox();
             this.text_ImageY = new System.Windows.Forms.TextBox();
             this.label_ImageY = new System.Windows.Forms.Label();
             this.button_DetailImageTrack = new System.Windows.Forms.Button();
             this.button_DrawPoints = new System.Windows.Forms.Button();
             this.button_EnterEastingNorthing = new System.Windows.Forms.Button();
+            this.label_ImageX = new System.Windows.Forms.Label();
+            this.text_OriginX = new System.Windows.Forms.TextBox();
+            this.text_OriginY = new System.Windows.Forms.TextBox();
+            this.label_Scale = new System.Windows.Forms.Label();
+            this.text_ScaleX = new System.Windows.Forms.TextBox();
+            this.text_ScaleY = new System.Windows.Forms.TextBox();
             this.panel_Top.SuspendLayout();
             // 
             // panel_Top
@@ -170,16 +176,16 @@ namespace SamMapTool
             this.text_Easting.BackColor = System.Drawing.SystemColors.Window;
             this.text_Easting.Text = "";
             // 
-            // label_ImageX
+            // label_Origin
             // 
-            this.label_ImageX.Name = "label_ImageX";
-            this.label_ImageX.ForeColor = System.Drawing.SystemColors.InfoText;
-            this.label_ImageX.Location = new System.Drawing.Point(552, 332);
-            this.label_ImageX.Image = null;
-            this.label_ImageX.TabIndex = 5;
-            this.label_ImageX.Size = new System.Drawing.Size(56, 20);
-            this.label_ImageX.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            this.label_ImageX.Text = "Image X:";
+            this.label_Origin.Name = "label_Origin";
+            this.label_Origin.ForeColor = System.Drawing.SystemColors.InfoText;
+            this.label_Origin.Location = new System.Drawing.Point(536, 490);
+            this.label_Origin.Image = null;
+            this.label_Origin.TabIndex = 5;
+            this.label_Origin.Size = new System.Drawing.Size(48, 20);
+            this.label_Origin.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
+            this.label_Origin.Text = "Origin:";
             // 
             // text_ImageX
             // 
@@ -249,13 +255,87 @@ namespace SamMapTool
             this.button_EnterEastingNorthing.Name = "button_EnterEastingNorthing";
             this.button_EnterEastingNorthing.ForeColor = System.Drawing.SystemColors.InfoText;
             this.button_EnterEastingNorthing.Location = new System.Drawing.Point(568, 456);
-            this.button_EnterEastingNorthing.TabIndex = 3;
-            this.button_EnterEastingNorthing.Size = new System.Drawing.Size(142, 24);
+            this.button_EnterEastingNorthing.TabIndex = 6;
+            this.button_EnterEastingNorthing.Size = new System.Drawing.Size(152, 24);
             this.button_EnterEastingNorthing.ImeMode = System.Windows.Forms.ImeMode.Disable;
             this.button_EnterEastingNorthing.BackColor = System.Drawing.SystemColors.ControlLight;
             this.button_EnterEastingNorthing.Text = "Enter Easting Northing";
             this.button_EnterEastingNorthing.UseVisualStyleBackColor = true;
             this.button_EnterEastingNorthing.Click += new System.EventHandler(this.button_EnterEastingNorthing_Click);
+            // 
+            // label_ImageX
+            // 
+            this.label_ImageX.Name = "label_ImageX";
+            this.label_ImageX.ForeColor = System.Drawing.SystemColors.InfoText;
+            this.label_ImageX.Location = new System.Drawing.Point(552, 332);
+            this.label_ImageX.Image = null;
+            this.label_ImageX.TabIndex = 5;
+            this.label_ImageX.Size = new System.Drawing.Size(56, 20);
+            this.label_ImageX.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
+            this.label_ImageX.Text = "Image X:";
+            // 
+            // text_OriginX
+            // 
+            this.text_OriginX.Name = "text_OriginX";
+            this.text_OriginX.TabStop = false;
+            this.text_OriginX.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.text_OriginX.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.text_OriginX.Location = new System.Drawing.Point(592, 488);
+            this.text_OriginX.TabIndex = 4;
+            this.text_OriginX.Size = new System.Drawing.Size(72, 20);
+            this.text_OriginX.ReadOnly = true;
+            this.text_OriginX.MaxLength = 4;
+            this.text_OriginX.Text = "";
+            // 
+            // text_OriginY
+            // 
+            this.text_OriginY.Name = "text_OriginY";
+            this.text_OriginY.TabStop = false;
+            this.text_OriginY.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.text_OriginY.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.text_OriginY.Location = new System.Drawing.Point(670, 488);
+            this.text_OriginY.TabIndex = 4;
+            this.text_OriginY.Size = new System.Drawing.Size(72, 20);
+            this.text_OriginY.ReadOnly = true;
+            this.text_OriginY.MaxLength = 4;
+            this.text_OriginY.Text = "";
+            // 
+            // label_Scale
+            // 
+            this.label_Scale.Name = "label_Scale";
+            this.label_Scale.ForeColor = System.Drawing.SystemColors.InfoText;
+            this.label_Scale.Location = new System.Drawing.Point(536, 520);
+            this.label_Scale.Image = null;
+            this.label_Scale.TabIndex = 5;
+            this.label_Scale.Size = new System.Drawing.Size(48, 20);
+            this.label_Scale.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
+            this.label_Scale.Text = "Scale:";
+            // 
+            // text_ScaleX
+            // 
+            this.text_ScaleX.Name = "text_ScaleX";
+            this.text_ScaleX.TabStop = false;
+            this.text_ScaleX.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.text_ScaleX.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.text_ScaleX.Location = new System.Drawing.Point(592, 518);
+            this.text_ScaleX.TabIndex = 4;
+            this.text_ScaleX.Size = new System.Drawing.Size(72, 20);
+            this.text_ScaleX.ReadOnly = true;
+            this.text_ScaleX.MaxLength = 4;
+            this.text_ScaleX.Text = "";
+            // 
+            // text_ScaleY
+            // 
+            this.text_ScaleY.Name = "text_ScaleY";
+            this.text_ScaleY.TabStop = false;
+            this.text_ScaleY.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.text_ScaleY.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.text_ScaleY.Location = new System.Drawing.Point(670, 518);
+            this.text_ScaleY.TabIndex = 4;
+            this.text_ScaleY.Size = new System.Drawing.Size(72, 20);
+            this.text_ScaleY.ReadOnly = true;
+            this.text_ScaleY.MaxLength = 4;
+            this.text_ScaleY.Text = "";
             // 
             // SamMapToolMain
             // 
@@ -271,11 +351,17 @@ namespace SamMapTool
             this.Controls.Add(this.label_Northing);
             this.Controls.Add(this.label_Easting);
             this.Controls.Add(this.text_Easting);
-            this.Controls.Add(this.label_ImageX);
+            this.Controls.Add(this.label_Origin);
             this.Controls.Add(this.text_ImageX);
             this.Controls.Add(this.text_ImageY);
             this.Controls.Add(this.label_ImageY);
             this.Controls.Add(this.button_EnterEastingNorthing);
+            this.Controls.Add(this.label_ImageX);
+            this.Controls.Add(this.text_OriginX);
+            this.Controls.Add(this.text_OriginY);
+            this.Controls.Add(this.label_Scale);
+            this.Controls.Add(this.text_ScaleX);
+            this.Controls.Add(this.text_ScaleY);
             this.KeyPreview = true;
             this.Text = "Sam's Map Tool";
             this.panel_Top.ResumeLayout(false);
@@ -291,13 +377,19 @@ namespace SamMapTool
         private System.Windows.Forms.Label label_Northing;
         private System.Windows.Forms.Label label_Easting;
         private System.Windows.Forms.TextBox text_Easting;
-        private System.Windows.Forms.Label label_ImageX;
+        private System.Windows.Forms.Label label_Origin;
         private System.Windows.Forms.TextBox text_ImageX;
         private System.Windows.Forms.TextBox text_ImageY;
         private System.Windows.Forms.Label label_ImageY;
         private System.Windows.Forms.Button button_DetailImageTrack;
         private System.Windows.Forms.Button button_DrawPoints;
         private System.Windows.Forms.Button button_EnterEastingNorthing;
+        private System.Windows.Forms.Label label_ImageX;
+        private System.Windows.Forms.TextBox text_OriginX;
+        private System.Windows.Forms.TextBox text_OriginY;
+        private System.Windows.Forms.Label label_Scale;
+        private System.Windows.Forms.TextBox text_ScaleX;
+        private System.Windows.Forms.TextBox text_ScaleY;
     }
     #endregion
 }

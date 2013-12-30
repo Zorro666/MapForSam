@@ -71,6 +71,7 @@ namespace SamMapTool
 			this.KeyPress += new KeyPressEventHandler(this_KeyPress);
 
 			this.DoubleBuffered = true;
+			SetOriginScale();
 		}
 		private void button_Quit_Click(object sender, EventArgs e)
 		{
@@ -120,10 +121,18 @@ namespace SamMapTool
 
 			SetStatusText(string.Format("Loaded '{0}' {1} x {2}", fileName, m_loadedImageWidth, m_loadedImageHeight));
 		}
-		private void RefreshImages()
+		private void RefreshImages ()
 		{
 			RefreshDisplayImage();
 			RefreshDetailImage();
+			SetOriginScale();
+		}
+		private void SetOriginScale()
+		{
+			this.text_OriginX.Text = String.Format("{0}", m_eastingZero);
+			this.text_OriginY.Text = String.Format("{0}", m_northingZero);
+			this.text_ScaleX.Text = String.Format("{0}", m_eastingScale);
+			this.text_ScaleY.Text = String.Format("{0}", m_northingScale);
 		}
 		private void SetStatusText(string status)
 		{
