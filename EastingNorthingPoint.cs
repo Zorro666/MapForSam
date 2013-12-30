@@ -1,6 +1,6 @@
 using System;
 
-namespace JakeTest
+namespace SamMapTool
 {
 	public class EastingNorthingPoint
 	{

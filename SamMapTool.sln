@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JakeTest", "JakeTest.csproj", "{16E54E8D-068F-44EA-8EC8-9A34E2F34E74}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SamMapTool", "SamMapTool.csproj", "{16E54E8D-068F-44EA-8EC8-9A34E2F34E74}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,7 +15,7 @@ Global
 		{16E54E8D-068F-44EA-8EC8-9A34E2F34E74}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = JakeTest.csproj
+		StartupItem = SamMapTool.csproj
 		Policies = $0
 		$0.TextStylePolicy = $1
 		$1.FileWidth = 120

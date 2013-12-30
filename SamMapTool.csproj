@@ -7,8 +7,8 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{16E54E8D-068F-44EA-8EC8-9A34E2F34E74}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>JakeTest</RootNamespace>
-    <AssemblyName>JakeTest</AssemblyName>
+    <RootNamespace>SamMapTool</RootNamespace>
+    <AssemblyName>SamMapTool</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -40,8 +40,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />
-    <Compile Include="JakeTestMainForm.Designer.cs" />
-    <Compile Include="JakeTestMainForm.cs" />
+    <Compile Include="SamMapToolMainForm.Designer.cs" />
+    <Compile Include="SamMapToolMainForm.cs" />
     <Compile Include="EastingNorthingDialog.cs" />
     <Compile Include="EastingNorthingDialog.Designer.cs" />
     <Compile Include="EastingNorthingPoint.cs" />

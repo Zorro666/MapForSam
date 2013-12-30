@@ -1,9 +1,9 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using JakeTest;
+using SamMapTool;
  
-public class HelloWorld : JakeTest.JakeTestMain
+public class HelloWorld : SamMapTool.SamMapToolMain
 {
 	static public void Main()
 	{

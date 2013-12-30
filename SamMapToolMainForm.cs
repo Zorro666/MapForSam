@@ -7,18 +7,18 @@ using System.Drawing.Drawing2D;
 using System.Text;
 using System.Windows.Forms;
 
-namespace JakeTest
+namespace SamMapTool
 {
-	public partial class JakeTestMain : Form
+	public partial class SamMapToolMain : Form
 	{
-		public JakeTestMain()
+		public SamMapToolMain()
 		{
 			InitializeComponent();
 			Init();
 		}
 		private void Init()
 		{
-			m_displayPoints = false;
+			m_displayPoints = true;
 			SetDrawPointsButtonState();
 
 			m_now = DateTime.Now;
@@ -70,20 +70,13 @@ namespace JakeTest
 
 			this.KeyPress += new KeyPressEventHandler(this_KeyPress);
 
-			this.button_Quit.Click += new EventHandler(Quit_Click);
-			this.button_LoadImage.Click += new EventHandler(LoadFile_Click);
-			this.button_DetailImageTrack.Click += new EventHandler(DetailImageTrack_Click);
-			this.button_DrawPoints.Click += new EventHandler(DrawPoints_Click);
-
-			this.scroll_DetailImageScale.ValueChanged += new EventHandler(DetailImageScale_Changed);
-
 			this.DoubleBuffered = true;
 		}
-		private void Quit_Click(object sender, EventArgs e)
+		private void button_Quit_Click(object sender, EventArgs e)
 		{
 			Application.Exit();
 		}
-		private void LoadFile_Click(object sender, EventArgs e)
+		private void button_LoadImage_Click(object sender, EventArgs e)
 		{
 			OpenFileDialog openFileDialog1 = new OpenFileDialog();
 
@@ -98,13 +91,24 @@ namespace JakeTest
 			m_loadedImageWidth = m_loadedImage.Size.Width;
 			m_loadedImageHeight = m_loadedImage.Size.Height;
 		}
-		private void DrawPoints_Click(object sender, EventArgs e)
+		private void button_DrawPoints_Click(object sender, EventArgs e)
 		{
 			ToggleDrawPoints();
 		}
-		private void DetailImageTrack_Click(object sender, EventArgs e)
+		private void button_DetailImageTrack_Click(object sender, EventArgs e)
 		{
 			ToggleDetailImageTrack();
+		}
+		private void button_EnterEastingNorthing_Click(object sender, EventArgs e)
+		{
+			int newEasting = Convert.ToInt32(this.text_Easting.Text);
+			int newNorthing = Convert.ToInt32(this.text_Northing.Text);
+			int pixelX = m_pointPixelX;
+			int pixelY = m_pointPixelY;
+			AddNewEastingNorthing(newEasting, newNorthing, pixelX, pixelY);
+			SetStatusText(string.Format("Easting Northing Dialog: Added {0}, {1}", newEasting, newNorthing));
+			m_detailImageTrack = true;
+			SetDetailImageTrackButtonState();
 		}
 		private void ImageLoadFile(string fileName)
 		{
@@ -185,9 +189,9 @@ namespace JakeTest
 			m_northingScale = (sumXY.Y - (sumX.Y * sumY.Y)/n) / denom;
 			m_northingZero = ((sumY.Y - m_northingScale * sumX.Y)) / n;
 		}
-		private void AddNewEastingNorthing(int newEasting, int newNorthing)
+		private void AddNewEastingNorthing(int newEasting, int newNorthing, int pixelX, int pixelY)
 		{
-			EastingNorthingPoint newPoint = new EastingNorthingPoint(newEasting, newNorthing, m_sourceImagePixelX, m_sourceImagePixelY);
+			EastingNorthingPoint newPoint = new EastingNorthingPoint(newEasting, newNorthing, pixelX, pixelY);
 			bool found = false;
 			foreach (EastingNorthingPoint point in m_points)
 			{
@@ -261,11 +265,11 @@ namespace JakeTest
 			}
 			if (e.Button == MOUSE_BUTTON_ENTER_EASTING_NORTHING)
 			{
-				EnterEastingNorthing();
+				EnterEastingNorthing(false);
 			}
 			if ((e.Button == MOUSE_BUTTON_ENTER_EASTING_NORTHING) && (Control.ModifierKeys == Keys.Control))
 			{
-				EnterEastingNorthing();
+				EnterEastingNorthing(true);
 			}
 		}
 		private void DisplayImage_DoubleClick(MouseEventArgs e)
@@ -413,27 +417,40 @@ namespace JakeTest
 			m_numClicks = 0;
 			DisplayImage_DoubleClick(e);
 		}
-		private void EnterEastingNorthing()
+		private void EnterEastingNorthing(bool useDialogBox)
 		{
-			EastingNorthingDialog eastingNorthingDialog = new EastingNorthingDialog(m_easting, m_northing);
-			DialogResult result = eastingNorthingDialog.ShowDialog(this);
-			if (result == DialogResult.OK)
+			if (useDialogBox)
 			{
-				if (eastingNorthingDialog.OK)
+				EastingNorthingDialog eastingNorthingDialog = new EastingNorthingDialog(m_easting, m_northing);
+				DialogResult result = eastingNorthingDialog.ShowDialog(this);
+				if (result == DialogResult.OK)
 				{
-					int newEasting = eastingNorthingDialog.Easting;
-					int newNorthing = eastingNorthingDialog.Northing;
-					AddNewEastingNorthing(newEasting, newNorthing);
-					SetStatusText(string.Format("Easting Northing Dialog: Added {0}, {1}", newEasting, newNorthing));
+					if (eastingNorthingDialog.OK)
+					{
+						int newEasting = eastingNorthingDialog.Easting;
+						int newNorthing = eastingNorthingDialog.Northing;
+						int pixelX = m_sourceImagePixelX;
+						int pixelY = m_sourceImagePixelY;
+						AddNewEastingNorthing(newEasting, newNorthing, pixelX, pixelY);
+						SetStatusText(string.Format("Easting Northing Dialog: Added {0}, {1}", newEasting, newNorthing));
+					}
+					else
+					{
+						SetStatusText("Easting Northing Dialog: Invalid Values");
+					}
 				}
 				else
 				{
-					SetStatusText("Easting Northing Dialog: Invalid Values");
+					SetStatusText("Easting Northing Dialog: Cancelled");
 				}
 			}
 			else
-			{
-				SetStatusText("Easting Northing Dialog: Cancelled");
+			{  
+				m_detailImageTrack = false;
+				m_pointPixelX = m_sourceImagePixelX;
+				m_pointPixelY = m_sourceImagePixelY;
+				SetDetailImageTrackButtonState();
+				SetStatusText("Enter Easting and Northing the click 'Enter Easting Northing' button");
 			}
 		}
 		private void this_KeyPress(object sender, KeyPressEventArgs k)
@@ -444,6 +461,10 @@ namespace JakeTest
 				if (k.KeyChar == 'p')
 				{
 					ToggleDrawPoints();
+				}
+				if (k.KeyChar == 'l')
+				{
+					ToggleDetailImageTrack();
 				}
 			}
 		}
@@ -481,7 +502,7 @@ namespace JakeTest
 				this.button_DetailImageTrack.Text = "Track";
 			}
 		}
-		private void DetailImageScale_Changed(object sender, EventArgs e)
+		private void scroll_DetailImageScale_ValueChanged(object sender, EventArgs e)
 		{
 			int value = this.scroll_DetailImageScale.Value;
 			m_detailImageDisplayScale = (float)(value);
@@ -527,8 +548,8 @@ namespace JakeTest
 				EastingNorthingPoint point = m_points[i];
 				Vector2 pixel = point.Pixel;
 
-				int x = (int)((float)(pixel.X - x0) / scale);
-				int y = (int)((float)(pixel.Y - y0) / scale);
+				int x = (int)((float)(pixel.X - x0) / scale) - pointWidth/2;
+				int y = (int)((float)(pixel.Y - y0) / scale) - pointHeight/2;
 				gr.DrawRectangle(pointColour, x, y, pointWidth, pointHeight);
 				gr.DrawLine(pointColour, x, y, x + pointWidth, y + pointHeight);
 				gr.DrawLine(pointColour, x, y + pointHeight, x + pointWidth, y);
@@ -542,6 +563,8 @@ namespace JakeTest
 			mY = (int)((float)(mY) / m_displayImageDisplayScale);
 			m_sourceImagePixelX = mX;
 			m_sourceImagePixelY = mY;
+			m_pointPixelX = m_sourceImagePixelX;
+			m_pointPixelY = m_sourceImagePixelY;
 		}
 		private void RefreshDetailImage()
 		{
@@ -597,6 +620,8 @@ namespace JakeTest
 		private int m_displayImageY;
 		private int m_sourceImagePixelX;
 		private int	m_sourceImagePixelY;
+		private int m_pointPixelX;
+		private int m_pointPixelY;
 
 		private Bitmap m_detailImage;
 		private Graphics m_detailGR;
