@@ -1,4 +1,5 @@
-* edit easting & northing entries directly without using the dialog + button to commit the new values
+* help dialog
+* save and load settings
 * system to choose north direction
 * system to enter scale value, lock the scale values
 * system to enter origin value, lock the origin values

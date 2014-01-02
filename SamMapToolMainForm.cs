@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Text;
 using System.Windows.Forms;
+using System.IO;
 
 namespace SamMapTool
 {
@@ -18,26 +19,29 @@ namespace SamMapTool
 		}
 		private void Init()
 		{
-			m_displayPoints = true;
+			m_statusText = "";
+			m_debugText = "";
+			m_settings.m_displayPoints = true;
 			SetDrawPointsButtonState();
 
 			m_now = DateTime.Now;
     	m_clickTimer = new Timer();
 			m_clickTimer.Interval = 10;
 			m_clickTimer.Tick += new EventHandler(ClickTimer_Tick);
-			m_points = new List<EastingNorthingPoint>();
+			m_settings.m_points = new List<EastingNorthingPoint>();
 			m_clickMouseEventArgs = new MouseEventArgs(MouseButtons.None, 0, 0, 0, 0);
 			m_downMouseEventArgs = new MouseEventArgs(MouseButtons.None, 0, 0, 0, 0);
 
+			m_settingsFileName = "";
 			m_loadedImage = null;
 			m_dragging = false;
 			m_dragX = 0;
 			m_dragY = 0;
 
-			m_eastingZero = 0;
-			m_northingZero = 0;
-			m_eastingScale = 1;
-			m_northingScale = 1;
+			m_settings.m_eastingZero = 0;
+			m_settings.m_northingZero = 0;
+			m_settings.m_eastingScale = 1;
+			m_settings.m_northingScale = 1;
 
 			m_displayImageX = 0;
 			m_displayImageY = 0;
@@ -49,7 +53,7 @@ namespace SamMapTool
 			m_displayGR.InterpolationMode = InterpolationMode.HighQualityBicubic;
 			RefreshDisplayImage();
 
-			m_detailImageTrack = true;
+			m_settings.m_detailImageTrack = true;
 			SetDetailImageTrackButtonState();
 
 			m_detailImageX = 0;
@@ -88,9 +92,17 @@ namespace SamMapTool
     	if(openFileDialog1.ShowDialog(this) != DialogResult.OK)
 				return;
 
-			ImageLoadFile(openFileDialog1.FileName);
+			string imageFilePath = openFileDialog1.FileName;
+			ImageLoadFile(imageFilePath);
 			m_loadedImageWidth = m_loadedImage.Size.Width;
 			m_loadedImageHeight = m_loadedImage.Size.Height;
+		}
+		private void button_Help_Click(object sender, EventArgs e)
+		{
+		}
+		private void button_Save_Click(object sender, EventArgs e)
+		{
+			SaveSettings();
 		}
 		private void button_DrawPoints_Click(object sender, EventArgs e)
 		{
@@ -107,9 +119,10 @@ namespace SamMapTool
 			int pixelX = m_pointPixelX;
 			int pixelY = m_pointPixelY;
 			AddNewEastingNorthing(newEasting, newNorthing, pixelX, pixelY);
-			SetStatusText(string.Format("Easting Northing Dialog: Added {0}, {1}", newEasting, newNorthing));
-			m_detailImageTrack = true;
+			SetDebugText(string.Format("Easting Northing Dialog: Added {0}, {1}", newEasting, newNorthing));
+			m_settings.m_detailImageTrack = true;
 			SetDetailImageTrackButtonState();
+			SetStatusText("Left Click or Ctrl+Left Click to select point");
 		}
 		private void ImageLoadFile(string fileName)
 		{
@@ -119,9 +132,22 @@ namespace SamMapTool
 			m_displayImageDisplayScale = 1.0f;
 			RefreshImages();
 
-			SetStatusText(string.Format("Loaded '{0}' {1} x {2}", fileName, m_loadedImageWidth, m_loadedImageHeight));
+			SetDebugText(string.Format("Loaded '{0}' {1} x {2}", fileName, m_loadedImageWidth, m_loadedImageHeight));
+			SetStatusText("Left Click or Ctrl+Left Click to select point");
+			string filename = Path.GetFileNameWithoutExtension(fileName) + ".sam";
+			string dir = Path.GetDirectoryName(fileName);
+			m_settingsFileName = Path.Combine(dir, filename);
+			this.Text = "Sam's Map Tool || " + fileName;
+			LoadSettings();
+			RefreshSettings();
 		}
-		private void RefreshImages ()
+		private void RefreshSettings()
+		{
+			SetDetailImageTrackButtonState();
+			SetDrawPointsButtonState();
+			SetOriginScale();
+		}
+		private void RefreshImages()
 		{
 			RefreshDisplayImage();
 			RefreshDetailImage();
@@ -129,14 +155,24 @@ namespace SamMapTool
 		}
 		private void SetOriginScale()
 		{
-			this.text_OriginX.Text = String.Format("{0}", m_eastingZero);
-			this.text_OriginY.Text = String.Format("{0}", m_northingZero);
-			this.text_ScaleX.Text = String.Format("{0}", m_eastingScale);
-			this.text_ScaleY.Text = String.Format("{0}", m_northingScale);
+			this.text_OriginX.Text = String.Format("{0}", m_settings.m_eastingZero);
+			this.text_OriginY.Text = String.Format("{0}", m_settings.m_northingZero);
+			this.text_ScaleX.Text = String.Format("{0}", m_settings.m_eastingScale);
+			this.text_ScaleY.Text = String.Format("{0}", m_settings.m_northingScale);
+		}
+		private void SetDebugText (string text)
+		{
+			m_debugText = text;
+			UpdateStatusText();
 		}
 		private void SetStatusText(string status)
 		{
-			this.text_Status.Text = status;
+			m_statusText = status;
+			UpdateStatusText();
+		}
+		private void UpdateStatusText ()
+		{
+			this.text_Status.Text = m_debugText + " || " + m_statusText;
 		}
 		private void SetImageXYText()
 		{
@@ -147,14 +183,14 @@ namespace SamMapTool
 		{
 			float eastingPixel = m_sourceImagePixelX;
 			float northingPixel = m_sourceImagePixelY;
-			float easting = m_eastingZero + eastingPixel * m_eastingScale;
-			float northing = m_northingZero + northingPixel * m_northingScale;
+			float easting = m_settings.m_eastingZero + eastingPixel * m_settings.m_eastingScale;
+			float northing = m_settings.m_northingZero + northingPixel * m_settings.m_northingScale;
 			m_easting = (int)Math.Round(easting);
 			m_northing = (int)Math.Round(northing);
 		}
 		private void ComputeBestFitEastingNorthing()
 		{
-			int n = m_points.Count;
+			int n = m_settings.m_points.Count;
 			if (n == 1)
 			{
 				SetStatusText("Need more than one Easting, Northing setting");
@@ -168,7 +204,7 @@ namespace SamMapTool
 
 			for (int i = 0; i < n; i++)
 			{
-				EastingNorthingPoint point = m_points[i];
+				EastingNorthingPoint point = m_settings.m_points[i];
 				Vector2 pixel = point.Pixel;
 				Vector2 eastingNorthing = point.EastingNorthing;
 
@@ -191,18 +227,18 @@ namespace SamMapTool
 			float denom;
 
 			denom = (sumXX.X - (sumX.X * sumX.X)/n);
-			m_eastingScale = (sumXY.X - (sumX.X * sumY.X)/n) / denom;
-			m_eastingZero = ((sumY.X - m_eastingScale * sumX.X)) / n;
+			m_settings.m_eastingScale = (sumXY.X - (sumX.X * sumY.X)/n) / denom;
+			m_settings.m_eastingZero = ((sumY.X - m_settings.m_eastingScale * sumX.X)) / n;
 
 			denom = (sumXX.Y - (sumX.Y * sumX.Y)/n);
-			m_northingScale = (sumXY.Y - (sumX.Y * sumY.Y)/n) / denom;
-			m_northingZero = ((sumY.Y - m_northingScale * sumX.Y)) / n;
+			m_settings.m_northingScale = (sumXY.Y - (sumX.Y * sumY.Y)/n) / denom;
+			m_settings.m_northingZero = ((sumY.Y - m_settings.m_northingScale * sumX.Y)) / n;
 		}
 		private void AddNewEastingNorthing(int newEasting, int newNorthing, int pixelX, int pixelY)
 		{
 			EastingNorthingPoint newPoint = new EastingNorthingPoint(newEasting, newNorthing, pixelX, pixelY);
 			bool found = false;
-			foreach (EastingNorthingPoint point in m_points)
+			foreach (EastingNorthingPoint point in m_settings.m_points)
 			{
 				if (point.PixelSame(newPoint))
 				{
@@ -215,7 +251,7 @@ namespace SamMapTool
 			}
 			if (found == false)
 			{
-				m_points.Add(newPoint);
+				m_settings.m_points.Add(newPoint);
 			}
 
 			ComputeBestFitEastingNorthing();
@@ -236,7 +272,7 @@ namespace SamMapTool
 		}
 		private void UpdateDetailImage(int x, int y)
 		{
-			if (m_detailImageTrack)
+			if (m_settings.m_detailImageTrack)
 			{
 				m_detailImageX = x;
 				m_detailImageY = y;
@@ -255,7 +291,7 @@ namespace SamMapTool
 				m_displayImageY -= (curY - m_dragY);
 				UpdateDisplayImage(curX, curY);
 			} 
-			else if (m_detailImageTrack)
+			else if (m_settings.m_detailImageTrack)
 			{
 				UpdateDetailImage(curX, curY);
 			}
@@ -263,7 +299,7 @@ namespace SamMapTool
 			if (debug)
 			{
 				string text = e.Location.ToString();
-				SetStatusText(text);
+				SetDebugText(text);
 			}
 		} 
 		private void DisplayImage_SingleClick(MouseEventArgs e)
@@ -284,7 +320,7 @@ namespace SamMapTool
 		private void DisplayImage_DoubleClick(MouseEventArgs e)
 		{
 			float displayScale = m_displayImageDisplayScale;
-			SetStatusText("Double-click:" + e.Button);
+			SetDebugText("Double-click:" + e.Button);
 			float zoomAmount = 0.0f;
 			if (e.Button == MouseButtons.Left)
 			{
@@ -333,7 +369,7 @@ namespace SamMapTool
 				ComputeImageXY();
 				m_displayImageX -= (int)((float)(m_sourceImagePixelX - oldX) * m_displayImageDisplayScale);
 				m_displayImageY -= (int)((float)(m_sourceImagePixelY - oldY) * m_displayImageDisplayScale);
-				SetStatusText("ImageDisplayScale:" + m_displayImageDisplayScale);
+				SetDebugText("ImageDisplayScale:" + m_displayImageDisplayScale);
 				ComputeImageXY();
 
 /*
@@ -372,7 +408,7 @@ namespace SamMapTool
 				m_dragX = e.Location.X;
 				m_dragY = e.Location.Y;
 				this.Cursor = Cursors.Cross;
-				SetStatusText("Dragging Start " + e.Location.ToString());
+				SetDebugText("Dragging Start " + e.Location.ToString());
 			}
 			m_downMouseEventArgs = e;
 		}
@@ -389,7 +425,7 @@ namespace SamMapTool
 				UpdateDisplayImage(curX, curY);
 				UpdateDetailImage(curX, curY);
 
-				SetStatusText("Dragging Stop");
+				SetDebugText("Dragging Stop");
 			}
 		}
 		private void DisplayImage_MouseClick(object sender, MouseEventArgs e)
@@ -441,7 +477,8 @@ namespace SamMapTool
 						int pixelX = m_sourceImagePixelX;
 						int pixelY = m_sourceImagePixelY;
 						AddNewEastingNorthing(newEasting, newNorthing, pixelX, pixelY);
-						SetStatusText(string.Format("Easting Northing Dialog: Added {0}, {1}", newEasting, newNorthing));
+						SetDebugText(string.Format("Easting Northing Dialog: Added {0}, {1}", newEasting, newNorthing));
+						SetStatusText("Left Click or Ctrl+Left Click to select point");
 					}
 					else
 					{
@@ -455,11 +492,11 @@ namespace SamMapTool
 			}
 			else
 			{  
-				m_detailImageTrack = false;
+				m_settings.m_detailImageTrack = false;
 				m_pointPixelX = m_sourceImagePixelX;
 				m_pointPixelY = m_sourceImagePixelY;
 				SetDetailImageTrackButtonState();
-				SetStatusText("Enter Easting and Northing the click 'Enter Easting Northing' button");
+				SetStatusText("Enter Easting and Northing values then click 'Enter Easting Northing' button");
 			}
 		}
 		private void this_KeyPress(object sender, KeyPressEventArgs k)
@@ -479,14 +516,14 @@ namespace SamMapTool
 		}
 		private void ToggleDrawPoints()
 		{
-			m_displayPoints ^= true;
+			m_settings.m_displayPoints ^= true;
 			SetDrawPointsButtonState();
 			RefreshImages();
-			SetStatusText(string.Format("DisplayPoints:{0}", m_displayPoints));
+			SetDebugText(string.Format("DisplayPoints:{0}", m_settings.m_displayPoints));
 		}
 		private void SetDrawPointsButtonState()
 		{
-			if (m_displayPoints == true)
+			if (m_settings.m_displayPoints == true)
 			{
 				this.button_DrawPoints.Text = "Hide Points";
 			}
@@ -497,12 +534,12 @@ namespace SamMapTool
 		}
 		private void ToggleDetailImageTrack()
 		{
-			m_detailImageTrack ^= true;
+			m_settings.m_detailImageTrack ^= true;
 			SetDetailImageTrackButtonState();
 		}
 		private void SetDetailImageTrackButtonState()
 		{
-			if (m_detailImageTrack == true)
+			if (m_settings.m_detailImageTrack == true)
 			{
 				this.button_DetailImageTrack.Text = "Lock";
 			}
@@ -516,7 +553,7 @@ namespace SamMapTool
 			int value = this.scroll_DetailImageScale.Value;
 			m_detailImageDisplayScale = (float)(value);
 			RefreshDetailImage();
-			SetStatusText("ImageScale:" + value);
+			SetDebugText("ImageScale:" + value);
 		}
 		private void RefreshDisplayImage()
 		{
@@ -540,7 +577,7 @@ namespace SamMapTool
 
 				m_displayGR.DrawImage(m_loadedImage, destRect, srcRect, GraphicsUnit.Pixel);
 			}
-			if (m_displayPoints)
+			if (m_settings.m_displayPoints)
 			{
 				int pointWidth = 10;
 				int pointHeight = 10;
@@ -551,10 +588,10 @@ namespace SamMapTool
 		private void DrawPoints(Graphics gr, int pointWidth, int pointHeight, int x0, int y0, float scale)
 		{
 			Pen pointColour = Pens.Yellow;
-			int n = m_points.Count;
+			int n = m_settings.m_points.Count;
 			for (int i = 0; i < n; i++)
 			{
-				EastingNorthingPoint point = m_points[i];
+				EastingNorthingPoint point = m_settings.m_points[i];
 				Vector2 pixel = point.Pixel;
 
 				int x = (int)((float)(pixel.X - x0) / scale) - pointWidth/2;
@@ -597,7 +634,7 @@ namespace SamMapTool
 				m_detailGR.DrawImage(m_loadedImage, destRect, srcRect, GraphicsUnit.Pixel);
 			}
 
-			if (m_displayPoints)
+			if (m_settings.m_displayPoints)
 			{
 				int pointWidth = 10;
 				int pointHeight = 10;
@@ -616,6 +653,182 @@ namespace SamMapTool
 
 			pictureBox_DetailImage.Image = m_detailImage;
 		}
+		private void SaveSettings()
+		{
+			if (m_settingsFileName.Length == 0)
+			{
+				MessageBox.Show("Save Ignored No Image Loaded");
+				return;
+			}
+			if (m_settings.Save(m_settingsFileName) == false)
+			{
+				return;
+			}
+		}
+		private void LoadSettings()
+		{
+			if (m_settingsFileName.Length == 0)
+			{
+				MessageBox.Show("Load Ignored No Image Loaded");
+				return;
+			}
+			if (m_settings.Load(m_settingsFileName) == false)
+			{
+				return;
+			}
+		}
+		private struct SamMapToolSettings
+		{
+			public float m_eastingZero;
+			public float m_northingZero;
+			public float m_eastingScale;
+			public float m_northingScale;
+			public List<EastingNorthingPoint> m_points;
+			public bool m_displayPoints;
+			public bool m_detailImageTrack;
+
+			public bool Save(string fileName)
+			{
+				try
+				{
+					StreamWriter outputStream = new StreamWriter(fileName);
+
+					outputStream.WriteLine("EastingZero");
+					outputStream.WriteLine(m_eastingZero);
+					outputStream.WriteLine("NorthingZero");
+					outputStream.WriteLine(m_northingZero);
+					outputStream.WriteLine("EastingScale");
+					outputStream.WriteLine(m_eastingScale);
+					outputStream.WriteLine("NorthingScale");
+					outputStream.WriteLine(m_northingScale);
+					outputStream.WriteLine("DisplayPoints");
+					outputStream.WriteLine(m_displayPoints);
+					outputStream.WriteLine("DetailImageTrack");
+					outputStream.WriteLine(m_detailImageTrack);
+					outputStream.WriteLine("NumPoints");
+					outputStream.WriteLine(m_points.Count);
+					for (int i = 0; i < m_points.Count; i++)
+					{
+						outputStream.WriteLine("Point[{0}]", i);
+						outputStream.WriteLine(m_points[i].EastingNorthing.X);
+						outputStream.WriteLine(m_points[i].EastingNorthing.Y);
+						outputStream.WriteLine(m_points[i].Pixel.X);
+						outputStream.WriteLine(m_points[i].Pixel.Y);
+					}
+
+					outputStream.Close();
+					return true;
+				}
+				catch (FileNotFoundException)
+				{
+					MessageBox.Show(String.Format("Save Failed : file '{0}' not found", fileName));
+					return false;
+				}
+				catch (IOException e)
+				{
+					MessageBox.Show(String.Format("Save Failed : file '{0}' : IO exception {0}", fileName, e.Message));
+					return false;
+				}
+				catch (Exception e)
+				{
+					MessageBox.Show(String.Format("Save Failed : file '{0}' : C# exception {0}", fileName, e.Message));
+					return false;
+				}
+			}
+			public bool Load(string fileName)
+			{
+				try
+				{
+					StreamReader inputStream = new StreamReader(fileName);
+					string param;
+					string value;
+
+					while (inputStream.EndOfStream == false)
+					{
+						param = inputStream.ReadLine();
+						value = inputStream.ReadLine();
+						if (param == "EastingZero")
+						{
+							m_eastingZero = Convert.ToSingle(value);
+						}
+						else if (param == "NorthingZero")
+						{
+							m_northingZero = Convert.ToSingle(value);
+						}
+						else if (param == "EastingScale")
+						{
+							m_eastingScale = Convert.ToSingle(value);
+						}
+						else if (param == "NorthingScale")
+						{
+							m_northingScale = Convert.ToSingle(value);
+						}
+						else if (param == "DisplayPoints")
+						{
+							m_displayPoints = Convert.ToBoolean(value);
+						}
+						else if (param == "DetailImageTrack")
+						{
+							m_detailImageTrack = Convert.ToBoolean(value);
+						}
+						else if (param == "NumPoints")
+						{
+							int numPoints = Convert.ToInt32(value);
+							m_points.Clear();
+							for (int i = 0; i < numPoints; i++)
+							{
+								param = inputStream.ReadLine();
+								if (param != string.Format("Point[{0}]", i))
+								{
+									MessageBox.Show(String.Format("Load Failed : file '{0}' : unknown parameter '{1}'", fileName, param));
+									inputStream.Close();
+									return false;
+								}
+								EastingNorthingPoint point = new EastingNorthingPoint();
+								value = inputStream.ReadLine();
+								point.EastingNorthing.X = Convert.ToInt64(value);
+								value = inputStream.ReadLine();
+								point.EastingNorthing.Y = Convert.ToInt64(value);
+								value = inputStream.ReadLine();
+								point.Pixel.X = Convert.ToInt64(value);
+								value = inputStream.ReadLine();
+								point.Pixel.Y = Convert.ToInt64(value);
+
+								m_points.Add(point);
+							}
+						}
+						else
+						{
+							MessageBox.Show(String.Format("Load Failed : file '{0}' : unknown parameter '{1}'", fileName, param));
+							inputStream.Close();
+							return false;
+						}
+					}
+
+					inputStream.Close();
+					return true;
+				}
+				catch (FileNotFoundException)
+				{
+					MessageBox.Show(String.Format("Load Failed : file '{0}' not found", fileName));
+					return false;
+				}
+				catch (IOException e)
+				{
+					MessageBox.Show(String.Format("Load Failed : file '{0}' : IO exception {0}", fileName, e.Message));
+					return false;
+				}
+				catch (Exception e)
+				{
+					MessageBox.Show(String.Format("Load Failed : file '{0}' : C# exception {0}", fileName, e.Message));
+					return false;
+				}
+			}
+		}
+
+		private SamMapToolSettings m_settings;
+
+		public string m_settingsFileName;
 		private Bitmap m_loadedImage;
 		private int m_loadedImageWidth;
 		private int m_loadedImageHeight;
@@ -643,25 +856,20 @@ namespace SamMapTool
 		private int m_dragX;
 		private int m_dragY;
 		private bool m_dragging;
-		private bool m_detailImageTrack;
 
 		private int m_easting;
 		private int m_northing;
-		private float m_eastingZero;
-		private float m_northingZero;
-		private float m_eastingScale;
-		private float m_northingScale;
 		private MouseButtons MOUSE_BUTTON_DRAG = MouseButtons.Left;
 		private MouseButtons MOUSE_BUTTON_ENTER_EASTING_NORTHING = MouseButtons.Left;
 		private MouseButtons MOUSE_BUTTON_DETAIL_LOCK_TOGGLE = MouseButtons.Right;
 
 		private Timer m_clickTimer;
-		private List<EastingNorthingPoint> m_points;
 		private int m_clickTimerMS;
 		private int m_numClicks = 0;
 		private DateTime m_now;
 		private MouseEventArgs m_clickMouseEventArgs;
 		private MouseEventArgs m_downMouseEventArgs;
-		private bool m_displayPoints;
+		private string m_debugText;
+		private string m_statusText;
 	}
 }

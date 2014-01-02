@@ -40,6 +40,8 @@ namespace SamMapTool
             this.label_Scale = new System.Windows.Forms.Label();
             this.text_ScaleX = new System.Windows.Forms.TextBox();
             this.text_ScaleY = new System.Windows.Forms.TextBox();
+            this.button_Save = new System.Windows.Forms.Button();
+            this.button_Help = new System.Windows.Forms.Button();
             this.panel_Top.SuspendLayout();
             // 
             // panel_Top
@@ -51,6 +53,8 @@ namespace SamMapTool
             this.panel_Top.Controls.Add(this.button_LoadImage);
             this.panel_Top.Controls.Add(this.button_DetailImageTrack);
             this.panel_Top.Controls.Add(this.button_DrawPoints);
+            this.panel_Top.Controls.Add(this.button_Save);
+            this.panel_Top.Controls.Add(this.button_Help);
             this.panel_Top.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.panel_Top.Size = new System.Drawing.Size(728, 48);
             this.panel_Top.BackColor = System.Drawing.SystemColors.ControlDarkDark;
@@ -228,9 +232,9 @@ namespace SamMapTool
             // 
             this.button_DetailImageTrack.Name = "button_DetailImageTrack";
             this.button_DetailImageTrack.ForeColor = System.Drawing.SystemColors.InfoText;
-            this.button_DetailImageTrack.Location = new System.Drawing.Point(552, 8);
+            this.button_DetailImageTrack.Location = new System.Drawing.Point(552, 12);
             this.button_DetailImageTrack.TabIndex = 2;
-            this.button_DetailImageTrack.Size = new System.Drawing.Size(70, 24);
+            this.button_DetailImageTrack.Size = new System.Drawing.Size(75, 24);
             this.button_DetailImageTrack.ImeMode = System.Windows.Forms.ImeMode.Disable;
             this.button_DetailImageTrack.BackColor = System.Drawing.SystemColors.ControlLight;
             this.button_DetailImageTrack.Text = "Lock";
@@ -241,9 +245,9 @@ namespace SamMapTool
             // 
             this.button_DrawPoints.Name = "button_DrawPoints";
             this.button_DrawPoints.ForeColor = System.Drawing.SystemColors.InfoText;
-            this.button_DrawPoints.Location = new System.Drawing.Point(632, 8);
+            this.button_DrawPoints.Location = new System.Drawing.Point(632, 12);
             this.button_DrawPoints.TabIndex = 3;
-            this.button_DrawPoints.Size = new System.Drawing.Size(80, 24);
+            this.button_DrawPoints.Size = new System.Drawing.Size(75, 24);
             this.button_DrawPoints.ImeMode = System.Windows.Forms.ImeMode.Disable;
             this.button_DrawPoints.BackColor = System.Drawing.SystemColors.ControlLight;
             this.button_DrawPoints.Text = "Draw Points";
@@ -337,6 +341,32 @@ namespace SamMapTool
             this.text_ScaleY.MaxLength = 4;
             this.text_ScaleY.Text = "";
             // 
+            // button_Save
+            // 
+            this.button_Save.Name = "button_Save";
+            this.button_Save.ForeColor = System.Drawing.SystemColors.InfoText;
+            this.button_Save.Location = new System.Drawing.Point(184, 12);
+            this.button_Save.TabIndex = 1;
+            this.button_Save.Size = new System.Drawing.Size(75, 24);
+            this.button_Save.ImeMode = System.Windows.Forms.ImeMode.Disable;
+            this.button_Save.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.button_Save.Text = "Save";
+            this.button_Save.UseVisualStyleBackColor = true;
+            this.button_Save.Click += new System.EventHandler(this.button_Save_Click);
+            // 
+            // button_Help
+            // 
+            this.button_Help.Name = "button_Help";
+            this.button_Help.ForeColor = System.Drawing.SystemColors.InfoText;
+            this.button_Help.Location = new System.Drawing.Point(272, 12);
+            this.button_Help.TabIndex = 1;
+            this.button_Help.Size = new System.Drawing.Size(75, 24);
+            this.button_Help.ImeMode = System.Windows.Forms.ImeMode.Disable;
+            this.button_Help.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.button_Help.Text = "Help";
+            this.button_Help.UseVisualStyleBackColor = true;
+            this.button_Help.Click += new System.EventHandler(this.button_Help_Click);
+            // 
             // SamMapToolMain
             // 
             this.Name = "SamMapToolMain";
@@ -390,6 +420,8 @@ namespace SamMapTool
         private System.Windows.Forms.Label label_Scale;
         private System.Windows.Forms.TextBox text_ScaleX;
         private System.Windows.Forms.TextBox text_ScaleY;
+        private System.Windows.Forms.Button button_Save;
+        private System.Windows.Forms.Button button_Help;
     }
     #endregion
 }
