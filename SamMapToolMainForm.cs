@@ -7,11 +7,13 @@ using System.Drawing.Drawing2D;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
+using System.Threading;
 
 namespace SamMapTool
 {
 	public partial class SamMapToolMain : Form
 	{
+		enum Mode { NORTH, CALIBRATE, TREES };
 		public SamMapToolMain()
 		{
 			InitializeComponent();
@@ -19,13 +21,16 @@ namespace SamMapTool
 		}
 		private void Init()
 		{
+			m_mode = Mode.CALIBRATE;
+			SetNorthCalibrateTreesState();
+
 			m_statusText = "";
 			m_debugText = "";
 			m_settings.m_displayPoints = true;
 			SetDrawPointsButtonState();
 
 			m_now = DateTime.Now;
-    	m_clickTimer = new Timer();
+    	m_clickTimer = new System.Windows.Forms.Timer();
 			m_clickTimer.Interval = 10;
 			m_clickTimer.Tick += new EventHandler(ClickTimer_Tick);
 			m_settings.m_points = new List<EastingNorthingPoint>();
@@ -99,6 +104,7 @@ namespace SamMapTool
 		}
 		private void button_Help_Click(object sender, EventArgs e)
 		{
+			ShowHelpDialog();
 		}
 		private void button_Save_Click(object sender, EventArgs e)
 		{
@@ -548,6 +554,54 @@ namespace SamMapTool
 				this.button_DetailImageTrack.Text = "Track";
 			}
 		}
+		private void SetNorthCalibrateTreesState()
+		{
+			this.button_Calibrate.Enabled = true;
+			this.button_Trees.Enabled = true;
+			this.button_North.Enabled = true;
+			this.button_North.BackColor = System.Drawing.SystemColors.ControlLight;
+			this.button_Calibrate.BackColor = System.Drawing.SystemColors.ControlLight;
+			this.button_Trees.BackColor = System.Drawing.SystemColors.ControlLight;
+
+			if (this.m_mode == Mode.NORTH)
+			{
+				this.button_North.Enabled = false;
+				this.button_North.BackColor = System.Drawing.SystemColors.ControlDark;
+				SetDebugText("Mode:NORTH");
+			}
+			else if (this.m_mode == Mode.CALIBRATE)
+			{
+				this.button_Calibrate.Enabled = false;
+				this.button_Calibrate.BackColor = System.Drawing.SystemColors.ControlDark;
+				SetDebugText("Mode:CALIBRATE");
+			}
+			else if (this.m_mode == Mode.TREES)
+			{
+				this.button_Trees.Enabled = false;
+				this.button_Trees.BackColor = System.Drawing.SystemColors.ControlDark;
+				SetDebugText("Mode:TREES");
+			}
+		}
+		private void button_North_Click(object sender, EventArgs e)
+		{
+			this.m_mode = Mode.NORTH;
+			SetNorthCalibrateTreesState();
+		}
+		private void button_Calibrate_Click(object sender, EventArgs e)
+		{
+			this.m_mode = Mode.CALIBRATE;
+			SetNorthCalibrateTreesState();
+		}
+		private void button_Trees_Click(object sender, EventArgs e)
+		{
+			this.m_mode = Mode.TREES;
+			SetNorthCalibrateTreesState();
+		}
+		private void scroll_North_ValueChanged(object sender, EventArgs e)
+		{
+			int value = this.scroll_North.Value;
+			SetDebugText("North:" + value);
+		}
 		private void scroll_DetailImageScale_ValueChanged(object sender, EventArgs e)
 		{
 			int value = this.scroll_DetailImageScale.Value;
@@ -825,9 +879,23 @@ namespace SamMapTool
 				}
 			}
 		}
+		private void ShowHelpDialog()
+		{
+			if (m_helpDialog == null)
+			{
+				m_helpDialog = new HelpDialog();
+				m_helpDialog.Closed += new EventHandler(this.helpDialog_Closed);
+				m_helpDialog.Show();
+			}
+		}
+		private void helpDialog_Closed(object sender, EventArgs e)
+		{
+			m_helpDialog = null;
+		}
 
 		private SamMapToolSettings m_settings;
 
+		private HelpDialog m_helpDialog;
 		public string m_settingsFileName;
 		private Bitmap m_loadedImage;
 		private int m_loadedImageWidth;
@@ -863,7 +931,7 @@ namespace SamMapTool
 		private MouseButtons MOUSE_BUTTON_ENTER_EASTING_NORTHING = MouseButtons.Left;
 		private MouseButtons MOUSE_BUTTON_DETAIL_LOCK_TOGGLE = MouseButtons.Right;
 
-		private Timer m_clickTimer;
+		private System.Windows.Forms.Timer m_clickTimer;
 		private int m_clickTimerMS;
 		private int m_numClicks = 0;
 		private DateTime m_now;
@@ -871,5 +939,6 @@ namespace SamMapTool
 		private MouseEventArgs m_downMouseEventArgs;
 		private string m_debugText;
 		private string m_statusText;
+		private Mode m_mode;
 	}
 }

@@ -46,5 +46,10 @@
     <Compile Include="EastingNorthingDialog.Designer.cs" />
     <Compile Include="EastingNorthingPoint.cs" />
     <Compile Include="Vector2.cs" />
+    <Compile Include="HelpDialog.cs" />
+    <Compile Include="HelpDialog.Designer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="help.rtf" />
   </ItemGroup>
 </Project>
