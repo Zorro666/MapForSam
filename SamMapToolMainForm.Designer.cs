@@ -68,7 +68,7 @@ namespace SamMapTool
             this.panel_Top.Controls.Add(this.button_Calibrate);
             this.panel_Top.Controls.Add(this.button_Trees);
             this.panel_Top.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.panel_Top.Size = new System.Drawing.Size(503, 48);
+            this.panel_Top.Size = new System.Drawing.Size(759, 48);
             this.panel_Top.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.panel_Top.Text = "panel1";
             // 
@@ -89,21 +89,15 @@ namespace SamMapTool
             // picturebox_DisplayImage
             // 
             this.picturebox_DisplayImage.Name = "picturebox_DisplayImage";
-            this.picturebox_DisplayImage.Location = new System.Drawing.Point(0, 48);
             this.picturebox_DisplayImage.Image = null;
             this.picturebox_DisplayImage.TabIndex = 0;
-						this.picturebox_DisplayImage.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.picturebox_DisplayImage.Dock = System.Windows.Forms.DockStyle.Fill;
             this.picturebox_DisplayImage.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-						this.picturebox_DisplayImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-						this.picturebox_DisplayImage.AutoSize = true;
+            this.picturebox_DisplayImage.Size = new System.Drawing.Size(759, 649);
+            this.picturebox_DisplayImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.picturebox_DisplayImage.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.picturebox_DisplayImage.Text = "pictureBox1";
-						this.picturebox_DisplayImage.SizeChanged += new System.EventHandler(this.picturebox_DisplayImage_SizeChanged);
-						this.picturebox_DisplayImage.MouseMove += new System.Windows.Forms.MouseEventHandler(DisplayImage_MouseMove);
-						this.picturebox_DisplayImage.MouseDown += new System.Windows.Forms.MouseEventHandler(DisplayImage_MouseDown);
-						this.picturebox_DisplayImage.MouseUp += new System.Windows.Forms.MouseEventHandler(DisplayImage_MouseUp);
-						this.picturebox_DisplayImage.MouseClick += new System.Windows.Forms.MouseEventHandler(DisplayImage_MouseClick);
-						this.picturebox_DisplayImage.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(DisplayImage_MouseDoubleClick);
+            this.picturebox_DisplayImage.SizeChanged += new System.EventHandler(this.picturebox_DisplayImage_SizeChanged);
             // 
             // text_Status
             // 
@@ -404,6 +398,7 @@ namespace SamMapTool
             this.button_Help.ForeColor = System.Drawing.SystemColors.InfoText;
             this.button_Help.Location = new System.Drawing.Point(662, 12);
             this.button_Help.TabIndex = 1;
+            this.button_Help.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.button_Help.Size = new System.Drawing.Size(75, 24);
             this.button_Help.ImeMode = System.Windows.Forms.ImeMode.Disable;
             this.button_Help.BackColor = System.Drawing.SystemColors.ControlLight;
@@ -415,7 +410,7 @@ namespace SamMapTool
             // 
             this.label_North.Name = "label_North";
             this.label_North.ForeColor = System.Drawing.SystemColors.InfoText;
-            this.label_North.Location = new System.Drawing.Point(42, 567);
+            this.label_North.Location = new System.Drawing.Point(42, 537);
             this.label_North.Image = null;
             this.label_North.TabIndex = 5;
             this.label_North.Anchor = (System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right);
@@ -429,7 +424,7 @@ namespace SamMapTool
             this.scroll_North.Tag = "";
             this.scroll_North.Size = new System.Drawing.Size(128, 20);
             this.scroll_North.Name = "scroll_North";
-            this.scroll_North.Location = new System.Drawing.Point(104, 571);
+            this.scroll_North.Location = new System.Drawing.Point(104, 536);
             this.scroll_North.Anchor = (System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right);
             this.scroll_North.Maximum = 1000;
             this.scroll_North.TabIndex = 0;
@@ -488,14 +483,14 @@ namespace SamMapTool
             this.panel_Bottom.Controls.Add(this.label_ImageX);
             this.panel_Bottom.Controls.Add(this.text_ImageX);
             this.panel_Bottom.Controls.Add(this.text_ImageY);
-            this.panel_Bottom.Size = new System.Drawing.Size(503, 48);
+            this.panel_Bottom.Size = new System.Drawing.Size(759, 48);
             this.panel_Bottom.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.panel_Bottom.Text = "panel1";
             // 
             // panel_Right
             // 
             this.panel_Right.Name = "panel_Right";
-            this.panel_Right.Location = new System.Drawing.Point(503, 0);
+            this.panel_Right.Location = new System.Drawing.Point(503, 48);
             this.panel_Right.TabIndex = 8;
             this.panel_Right.Dock = System.Windows.Forms.DockStyle.Right;
             this.panel_Right.Controls.Add(this.pictureBox_DetailImage);
@@ -513,7 +508,7 @@ namespace SamMapTool
             this.panel_Right.Controls.Add(this.label_North);
             this.panel_Right.Controls.Add(this.label_Origin);
             this.panel_Right.Controls.Add(this.text_OriginX);
-            this.panel_Right.Size = new System.Drawing.Size(256, 649);
+            this.panel_Right.Size = new System.Drawing.Size(256, 553);
             this.panel_Right.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.panel_Right.Text = "panel1";
             // 

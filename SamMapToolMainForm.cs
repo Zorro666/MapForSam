@@ -22,6 +22,7 @@ namespace SamMapTool
 		}
 		private void Init()
 		{
+			m_settings.m_numNorthPoints = 0;
 			m_mouseCurX = 0;
 			m_mouseCurY = 0;
 			m_enterEastingNorthing = false;
@@ -74,6 +75,12 @@ namespace SamMapTool
 			m_detailGR = Graphics.FromImage(m_detailImage);
 			m_detailGR.InterpolationMode = InterpolationMode.HighQualityBicubic;
 			RefreshDetailImage();
+
+			this.picturebox_DisplayImage.MouseMove += new System.Windows.Forms.MouseEventHandler(DisplayImage_MouseMove);
+			this.picturebox_DisplayImage.MouseDown += new System.Windows.Forms.MouseEventHandler(DisplayImage_MouseDown);
+			this.picturebox_DisplayImage.MouseUp += new System.Windows.Forms.MouseEventHandler(DisplayImage_MouseUp);
+			this.picturebox_DisplayImage.MouseClick += new System.Windows.Forms.MouseEventHandler(DisplayImage_MouseClick);
+			this.picturebox_DisplayImage.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(DisplayImage_MouseDoubleClick);
 
 			this.KeyPress += new KeyPressEventHandler(this_KeyPress);
 
@@ -320,6 +327,18 @@ namespace SamMapTool
 			{
 				UpdateDetailImage();
 			}
+			if (m_mode == Mode.NORTH)
+			{
+				ComputeImageXY();
+				if (m_settings.m_numNorthPoints == 1)
+				{
+					int pixelX = m_sourceImagePixelX;
+					int pixelY = m_sourceImagePixelY;
+					m_settings.m_northPoint1_X = pixelX;
+					m_settings.m_northPoint1_Y = pixelY;
+					RefreshDisplayImage();
+				}
+			}
 			bool debug = false;
 			if (debug)
 			{
@@ -350,10 +369,31 @@ namespace SamMapTool
 			}
 			else if (m_mode == Mode.NORTH)
 			{
+				EnterNorthPoint();
 			}
 			else if (m_mode == Mode.TREES)
 			{
 			}
+		}
+		private void EnterNorthPoint ()
+		{
+			int pixelX = m_sourceImagePixelX;
+			int pixelY = m_sourceImagePixelY;
+			if (m_settings.m_numNorthPoints == 0)
+			{
+				m_settings.m_numNorthPoints = 1;
+				m_settings.m_northPoint0_X = pixelX;
+				m_settings.m_northPoint0_Y = pixelY;
+				m_settings.m_northPoint1_X = pixelX;
+				m_settings.m_northPoint1_Y = pixelY;
+			}
+			else if (m_settings.m_numNorthPoints == 1)
+			{
+				m_settings.m_numNorthPoints = 2;
+				m_settings.m_northPoint1_X = pixelX;
+				m_settings.m_northPoint1_Y = pixelY;
+			}
+			RefreshDisplayImage();
 		}
 		private void EndEnterEastingNorthing()
 		{
@@ -553,8 +593,6 @@ namespace SamMapTool
 				m_settings.m_detailImageTrack = false;
 				m_pointPixelX = m_sourceImagePixelX;
 				m_pointPixelY = m_sourceImagePixelY;
-				//RefreshDetailImage();
-				//RefreshDisplayImage();
 				RefreshImages();
 				SetDetailImageTrackButtonState();
 				SetStatusText("Enter Easting and Northing values then click 'Enter Easting Northing' button");
@@ -700,6 +738,17 @@ namespace SamMapTool
 				Vector2 pixel = new Vector2(m_pointPixelX, m_pointPixelY);
 				DrawPoint(m_displayGR, pixel, pointColour, pointWidth, pointHeight, sX, sY, 1.0f/m_displayImageDisplayScale);
 			}
+			if (m_settings.m_numNorthPoints > 0)
+			{
+				Pen pointColour = Pens.Green;
+				int pointWidth = 20;
+				int pointHeight = 20;
+				Vector2 start = new Vector2(m_settings.m_northPoint0_X, m_settings.m_northPoint0_Y);
+				DrawPoint(m_displayGR, start, pointColour, pointWidth, pointHeight, sX, sY, 1.0f/m_displayImageDisplayScale);
+				Vector2 end = new Vector2(m_settings.m_northPoint1_X, m_settings.m_northPoint1_Y);
+				DrawPoint(m_displayGR, end, pointColour, pointWidth, pointHeight, sX, sY, 1.0f/m_displayImageDisplayScale);
+				DrawLine(m_displayGR, start, end, pointColour, sX, sY, 1.0f/m_displayImageDisplayScale);
+			}
 			picturebox_DisplayImage.Image = m_displayImage;
 		}
 		private void DrawPoints(Graphics gr, int pointWidth, int pointHeight, int x0, int y0, float scale)
@@ -713,6 +762,14 @@ namespace SamMapTool
 
 				DrawPoint(gr, pixel, pointColour, pointWidth, pointHeight, x0, y0, scale);
 			}
+		}
+		private void DrawLine(Graphics gr, Vector2 start, Vector2 end, Pen pointColour, int x0, int y0, float scale)
+		{
+			int xs = (int)((float)(start.X - x0) / scale);
+			int ys = (int)((float)(start.Y - y0) / scale);
+			int xe = (int)((float)(end.X - x0) / scale);
+			int ye = (int)((float)(end.Y - y0) / scale);
+			gr.DrawLine(pointColour, xs, ys, xe, ye);
 		}
 		private void DrawPoint(Graphics gr, Vector2 pixel, Pen pointColour, int pointWidth, int pointHeight, int x0, int y0, float scale)
 		{
@@ -807,6 +864,11 @@ namespace SamMapTool
 			public List<EastingNorthingPoint> m_points;
 			public bool m_displayPoints;
 			public bool m_detailImageTrack;
+			public int m_numNorthPoints;
+			public int m_northPoint0_X;
+			public int m_northPoint0_Y;
+			public int m_northPoint1_X;
+			public int m_northPoint1_Y;
 
 			public bool Save(string fileName)
 			{
@@ -826,6 +888,16 @@ namespace SamMapTool
 					outputStream.WriteLine(m_displayPoints);
 					outputStream.WriteLine("DetailImageTrack");
 					outputStream.WriteLine(m_detailImageTrack);
+					outputStream.WriteLine("NumNorthPoints");
+					outputStream.WriteLine(m_numNorthPoints);
+					outputStream.WriteLine("NorthPoint0_X");
+					outputStream.WriteLine(m_northPoint0_X);
+					outputStream.WriteLine("NorthPoint0_Y");
+					outputStream.WriteLine(m_northPoint0_Y);
+					outputStream.WriteLine("NorthPoint1_X");
+					outputStream.WriteLine(m_northPoint0_X);
+					outputStream.WriteLine("NorthPoint1_Y");
+					outputStream.WriteLine(m_northPoint0_Y);
 					outputStream.WriteLine("NumPoints");
 					outputStream.WriteLine(m_points.Count);
 					for (int i = 0; i < m_points.Count; i++)
@@ -891,6 +963,26 @@ namespace SamMapTool
 						else if (param == "DetailImageTrack")
 						{
 							m_detailImageTrack = Convert.ToBoolean(value);
+						}
+						else if (param == "NumNorthPoints")
+						{
+							m_numNorthPoints = Convert.ToInt32(value);
+						}
+						else if (param == "NorthPoint0_X")
+						{
+							m_northPoint0_X = Convert.ToInt32(value);
+						}
+						else if (param == "NorthPoint0_Y")
+						{
+							m_northPoint0_Y = Convert.ToInt32(value);
+						}
+						else if (param == "NorthPoint1_X")
+						{
+							m_northPoint1_X = Convert.ToInt32(value);
+						}
+						else if (param == "NorthPoint1_Y")
+						{
+							m_northPoint1_Y = Convert.ToInt32(value);
 						}
 						else if (param == "NumPoints")
 						{
