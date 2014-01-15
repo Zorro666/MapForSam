@@ -22,6 +22,9 @@ namespace SamMapTool
 		}
 		private void Init()
 		{
+			m_mouseCurX = 0;
+			m_mouseCurY = 0;
+			m_enterEastingNorthing = false;
 			m_mode = Mode.CALIBRATE;
 			SetNorthCalibrateTreesState();
 
@@ -127,17 +130,18 @@ namespace SamMapTool
 		{
 			ToggleDetailImageTrack();
 		}
-		private void button_EnterEastingNorthing_Click(object sender, EventArgs e)
+		private void button_EnterEastingNorthing_Click (object sender, EventArgs e)
 		{
-			int newEasting = Convert.ToInt32(this.text_Easting.Text);
-			int newNorthing = Convert.ToInt32(this.text_Northing.Text);
-			int pixelX = m_pointPixelX;
-			int pixelY = m_pointPixelY;
-			AddNewEastingNorthing(newEasting, newNorthing, pixelX, pixelY);
-			SetDebugText(string.Format("Easting Northing Dialog: Added {0}, {1}", newEasting, newNorthing));
-			m_settings.m_detailImageTrack = true;
-			SetDetailImageTrackButtonState();
-			SetStatusText("Left Click or Ctrl+Left Click to select point");
+			if (m_enterEastingNorthing == true)
+			{
+				int newEasting = Convert.ToInt32(this.text_Easting.Text);
+				int newNorthing = Convert.ToInt32(this.text_Northing.Text);
+				int pixelX = m_pointPixelX;
+				int pixelY = m_pointPixelY;
+				AddNewEastingNorthing(newEasting, newNorthing, pixelX, pixelY);
+				SetDebugText(string.Format("Easting Northing Dialog: Added {0}, {1}", newEasting, newNorthing));
+			}
+			EndEnterEastingNorthing();
 		}
 		private void ImageLoadFile(string fileName)
 		{
@@ -279,18 +283,18 @@ namespace SamMapTool
 			this.text_Easting.Text = m_easting.ToString();
 			this.text_Northing.Text = m_northing.ToString();
 		}
-		private void UpdateDisplayImage(int x, int y)
+		private void UpdateDisplayImage()
 		{
-			m_dragX = x;
-			m_dragY = y;
+			m_dragX = m_mouseCurX;
+			m_dragY = m_mouseCurY;
 			RefreshDisplayImage();
 		}
-		private void UpdateDetailImage(int x, int y)
+		private void UpdateDetailImage()
 		{
 			if (m_settings.m_detailImageTrack)
 			{
-				m_detailImageX = x;
-				m_detailImageY = y;
+				m_detailImageX = m_mouseCurX;
+				m_detailImageY = m_mouseCurY;
 				RefreshDetailImage();
 				SetImageXYText();
 				SetEastingNorthingText();
@@ -300,15 +304,21 @@ namespace SamMapTool
 		{
 			int curX = e.Location.X;
 			int curY = e.Location.Y;
+			m_mouseCurX = curX;
+			m_mouseCurY = curY;
 			if (m_dragging) 
 			{
 				m_displayImageX -= (curX - m_dragX);
 				m_displayImageY -= (curY - m_dragY);
-				UpdateDisplayImage(curX, curY);
+				UpdateDisplayImage();
+				if (m_enterEastingNorthing == true)
+				{
+					EndEnterEastingNorthing();
+ 				}
 			} 
 			else if (m_settings.m_detailImageTrack)
 			{
-				UpdateDetailImage(curX, curY);
+				UpdateDetailImage();
 			}
 			bool debug = false;
 			if (debug)
@@ -324,6 +334,10 @@ namespace SamMapTool
 				if (e.Button == MOUSE_BUTTON_DETAIL_LOCK_TOGGLE)
 				{
 					ToggleDetailImageTrack();
+					if (m_enterEastingNorthing == true)
+					{
+						EndEnterEastingNorthing();
+ 					}
 				}
 				else if ((e.Button == MOUSE_BUTTON_ENTER_EASTING_NORTHING) && (Control.ModifierKeys == Keys.Control))
 				{
@@ -341,8 +355,20 @@ namespace SamMapTool
 			{
 			}
 		}
-		private void DisplayImage_DoubleClick(MouseEventArgs e)
+		private void EndEnterEastingNorthing()
 		{
+			UpdateDetailImage();
+			m_enterEastingNorthing = false;
+			m_settings.m_detailImageTrack = true;
+			SetDetailImageTrackButtonState();
+			SetStatusText("Left Click or Ctrl+Left Click to select point");
+		}
+		private void DisplayImage_DoubleClick (MouseEventArgs e)
+		{
+			if (m_enterEastingNorthing == true)
+			{
+				EndEnterEastingNorthing();
+ 			}
 			float displayScale = m_displayImageDisplayScale;
 			SetDebugText("Double-click:" + e.Button);
 			float zoomAmount = 0.0f;
@@ -445,9 +471,11 @@ namespace SamMapTool
 
 				int curX = e.Location.X;
 				int curY = e.Location.Y;
+				m_mouseCurX = curX;
+				m_mouseCurY = curY;
 
-				UpdateDisplayImage(curX, curY);
-				UpdateDetailImage(curX, curY);
+				UpdateDisplayImage();
+				UpdateDetailImage();
 
 				SetDebugText("Dragging Stop");
 			}
@@ -516,6 +544,7 @@ namespace SamMapTool
 			}
 			else
 			{  
+				m_enterEastingNorthing = true;
 				m_settings.m_detailImageTrack = false;
 				m_pointPixelX = m_sourceImagePixelX;
 				m_pointPixelY = m_sourceImagePixelY;
@@ -958,5 +987,8 @@ namespace SamMapTool
 		private string m_debugText;
 		private string m_statusText;
 		private Mode m_mode;
+		private bool m_enterEastingNorthing;
+		private int m_mouseCurX;
+		private int m_mouseCurY;
 	}
 }
