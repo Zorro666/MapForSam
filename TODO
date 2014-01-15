@@ -1,8 +1,14 @@
-* help dialog
-* save and load settings
-* system to choose north direction
+* north mode : system to choose north direction
+** 1st click : point 1
+** 2nd click : point 2 : draw line & update north angle scroll
+** use angle scroll to rotate line about its centre
+** click either point to drag them around
+
 * system to enter scale value, lock the scale values
 * system to enter origin value, lock the origin values
+
+* trees mode : output tree inputs as nice output file
+* output file format update for sam as he needs
 * keyboard shortcuts: zoom in/out, toggle tracking
 
 * Bredon Hill / Empress junction = 434638, 335093
