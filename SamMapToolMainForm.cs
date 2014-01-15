@@ -168,8 +168,8 @@ namespace SamMapTool
 		}
 		private void RefreshImages()
 		{
-			RefreshDisplayImage();
 			RefreshDetailImage();
+			RefreshDisplayImage();
 			SetOriginScale();
 		}
 		private void SetOriginScale()
@@ -357,9 +357,12 @@ namespace SamMapTool
 		}
 		private void EndEnterEastingNorthing()
 		{
-			UpdateDetailImage();
 			m_enterEastingNorthing = false;
 			m_settings.m_detailImageTrack = true;
+
+			ComputeImageXY();
+			UpdateDetailImage();
+			UpdateDisplayImage();
 			SetDetailImageTrackButtonState();
 			SetStatusText("Left Click or Ctrl+Left Click to select point");
 		}
@@ -544,10 +547,15 @@ namespace SamMapTool
 			}
 			else
 			{  
+				m_settings.m_detailImageTrack = true;
+				UpdateDetailImage();
 				m_enterEastingNorthing = true;
 				m_settings.m_detailImageTrack = false;
 				m_pointPixelX = m_sourceImagePixelX;
 				m_pointPixelY = m_sourceImagePixelY;
+				//RefreshDetailImage();
+				//RefreshDisplayImage();
+				RefreshImages();
 				SetDetailImageTrackButtonState();
 				SetStatusText("Enter Easting and Northing values then click 'Enter Easting Northing' button");
 			}
@@ -684,6 +692,14 @@ namespace SamMapTool
 				int pointHeight = 10;
 				DrawPoints(m_displayGR, pointWidth, pointHeight, sX, sY, 1.0f/m_displayImageDisplayScale);
 			}
+			if (m_enterEastingNorthing == true)
+			{
+				Pen pointColour = Pens.Red;
+				int pointWidth = 20;
+				int pointHeight = 20;
+				Vector2 pixel = new Vector2(m_pointPixelX, m_pointPixelY);
+				DrawPoint(m_displayGR, pixel, pointColour, pointWidth, pointHeight, sX, sY, 1.0f/m_displayImageDisplayScale);
+			}
 			picturebox_DisplayImage.Image = m_displayImage;
 		}
 		private void DrawPoints(Graphics gr, int pointWidth, int pointHeight, int x0, int y0, float scale)
@@ -695,12 +711,16 @@ namespace SamMapTool
 				EastingNorthingPoint point = m_settings.m_points[i];
 				Vector2 pixel = point.Pixel;
 
-				int x = (int)((float)(pixel.X - x0) / scale) - pointWidth/2;
-				int y = (int)((float)(pixel.Y - y0) / scale) - pointHeight/2;
-				gr.DrawRectangle(pointColour, x, y, pointWidth, pointHeight);
-				gr.DrawLine(pointColour, x, y, x + pointWidth, y + pointHeight);
-				gr.DrawLine(pointColour, x, y + pointHeight, x + pointWidth, y);
+				DrawPoint(gr, pixel, pointColour, pointWidth, pointHeight, x0, y0, scale);
 			}
+		}
+		private void DrawPoint(Graphics gr, Vector2 pixel, Pen pointColour, int pointWidth, int pointHeight, int x0, int y0, float scale)
+		{
+			int x = (int)((float)(pixel.X - x0) / scale) - pointWidth/2;
+			int y = (int)((float)(pixel.Y - y0) / scale) - pointHeight/2;
+			gr.DrawRectangle(pointColour, x, y, pointWidth, pointHeight);
+			gr.DrawLine(pointColour, x, y, x + pointWidth, y + pointHeight);
+			gr.DrawLine(pointColour, x, y + pointHeight, x + pointWidth, y);
 		}
 		private void ComputeImageXY()
 		{
