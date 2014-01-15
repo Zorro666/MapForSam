@@ -308,19 +308,28 @@ namespace SamMapTool
 				SetDebugText(text);
 			}
 		} 
-		private void DisplayImage_SingleClick(MouseEventArgs e)
+		private void DisplayImage_SingleClick (MouseEventArgs e)
 		{
-			if (e.Button == MOUSE_BUTTON_DETAIL_LOCK_TOGGLE)
+			if (m_mode == Mode.CALIBRATE)
 			{
-				ToggleDetailImageTrack();
+				if (e.Button == MOUSE_BUTTON_DETAIL_LOCK_TOGGLE)
+				{
+					ToggleDetailImageTrack();
+				}
+				else if ((e.Button == MOUSE_BUTTON_ENTER_EASTING_NORTHING) && (Control.ModifierKeys == Keys.Control))
+				{
+					EnterEastingNorthing(true);
+				}
+				else if (e.Button == MOUSE_BUTTON_ENTER_EASTING_NORTHING)
+				{
+					EnterEastingNorthing(false);
+				}
 			}
-			if (e.Button == MOUSE_BUTTON_ENTER_EASTING_NORTHING)
+			else if (m_mode == Mode.NORTH)
 			{
-				EnterEastingNorthing(false);
 			}
-			if ((e.Button == MOUSE_BUTTON_ENTER_EASTING_NORTHING) && (Control.ModifierKeys == Keys.Control))
+			else if (m_mode == Mode.TREES)
 			{
-				EnterEastingNorthing(true);
 			}
 		}
 		private void DisplayImage_DoubleClick(MouseEventArgs e)

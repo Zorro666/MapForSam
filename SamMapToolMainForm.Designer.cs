@@ -47,13 +47,17 @@ namespace SamMapTool
             this.button_North = new System.Windows.Forms.Button();
             this.button_Calibrate = new System.Windows.Forms.Button();
             this.button_Trees = new System.Windows.Forms.Button();
+            this.panel_Bottom = new System.Windows.Forms.Panel();
+            this.panel_Right = new System.Windows.Forms.Panel();
             this.panel_Top.SuspendLayout();
+            this.panel_Bottom.SuspendLayout();
+            this.panel_Right.SuspendLayout();
             // 
             // panel_Top
             // 
             this.panel_Top.Name = "panel_Top";
-            this.panel_Top.Location = new System.Drawing.Point(16, 24);
             this.panel_Top.TabIndex = 0;
+            this.panel_Top.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel_Top.Controls.Add(this.button_Quit);
             this.panel_Top.Controls.Add(this.button_LoadImage);
             this.panel_Top.Controls.Add(this.button_DetailImageTrack);
@@ -64,7 +68,7 @@ namespace SamMapTool
             this.panel_Top.Controls.Add(this.button_Calibrate);
             this.panel_Top.Controls.Add(this.button_Trees);
             this.panel_Top.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.panel_Top.Size = new System.Drawing.Size(728, 48);
+            this.panel_Top.Size = new System.Drawing.Size(503, 48);
             this.panel_Top.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.panel_Top.Text = "panel1";
             // 
@@ -74,6 +78,7 @@ namespace SamMapTool
             this.button_Quit.ForeColor = System.Drawing.SystemColors.InfoText;
             this.button_Quit.Location = new System.Drawing.Point(8, 12);
             this.button_Quit.TabIndex = 0;
+            this.button_Quit.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.button_Quit.Size = new System.Drawing.Size(75, 24);
             this.button_Quit.ImeMode = System.Windows.Forms.ImeMode.Disable;
             this.button_Quit.BackColor = System.Drawing.SystemColors.ControlLight;
@@ -84,9 +89,10 @@ namespace SamMapTool
             // picturebox_DisplayImage
             // 
             this.picturebox_DisplayImage.Name = "picturebox_DisplayImage";
-            this.picturebox_DisplayImage.Location = new System.Drawing.Point(16, 80);
+            this.picturebox_DisplayImage.Location = new System.Drawing.Point(0, 48);
             this.picturebox_DisplayImage.Image = null;
             this.picturebox_DisplayImage.TabIndex = 0;
+						this.picturebox_DisplayImage.Dock = System.Windows.Forms.DockStyle.Fill;
             this.picturebox_DisplayImage.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.picturebox_DisplayImage.Size = new System.Drawing.Size(512, 512);
             this.picturebox_DisplayImage.BackColor = System.Drawing.SystemColors.ControlDarkDark;
@@ -98,8 +104,9 @@ namespace SamMapTool
             this.text_Status.TabStop = false;
             this.text_Status.ForeColor = System.Drawing.SystemColors.WindowText;
             this.text_Status.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.text_Status.Location = new System.Drawing.Point(24, 608);
+            this.text_Status.Location = new System.Drawing.Point(8, 16);
             this.text_Status.TabIndex = 1;
+            this.text_Status.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.text_Status.Size = new System.Drawing.Size(544, 20);
             this.text_Status.ReadOnly = true;
             this.text_Status.BackColor = System.Drawing.SystemColors.Window;
@@ -111,6 +118,7 @@ namespace SamMapTool
             this.button_LoadImage.ForeColor = System.Drawing.SystemColors.InfoText;
             this.button_LoadImage.Location = new System.Drawing.Point(96, 12);
             this.button_LoadImage.TabIndex = 1;
+            this.button_LoadImage.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.button_LoadImage.Size = new System.Drawing.Size(75, 24);
             this.button_LoadImage.ImeMode = System.Windows.Forms.ImeMode.Disable;
             this.button_LoadImage.BackColor = System.Drawing.SystemColors.ControlLight;
@@ -121,9 +129,10 @@ namespace SamMapTool
             // pictureBox_DetailImage
             // 
             this.pictureBox_DetailImage.Name = "pictureBox_DetailImage";
-            this.pictureBox_DetailImage.Location = new System.Drawing.Point(536, 80);
+            this.pictureBox_DetailImage.Location = new System.Drawing.Point(40, 8);
             this.pictureBox_DetailImage.Image = null;
             this.pictureBox_DetailImage.TabIndex = 2;
+            this.pictureBox_DetailImage.Anchor = (System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right);
             this.pictureBox_DetailImage.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.pictureBox_DetailImage.Size = new System.Drawing.Size(200, 200);
             this.pictureBox_DetailImage.BackColor = System.Drawing.SystemColors.ControlDarkDark;
@@ -137,19 +146,21 @@ namespace SamMapTool
             this.scroll_DetailImageScale.Name = "scroll_DetailImageScale";
             this.scroll_DetailImageScale.Value = 4;
             this.scroll_DetailImageScale.LargeChange = 1;
-            this.scroll_DetailImageScale.Location = new System.Drawing.Point(544, 288);
+            this.scroll_DetailImageScale.Location = new System.Drawing.Point(48, 216);
+            this.scroll_DetailImageScale.Anchor = (System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right);
             this.scroll_DetailImageScale.Maximum = 10;
             this.scroll_DetailImageScale.Minimum = 2;
             this.scroll_DetailImageScale.TabIndex = 2;
-						this.scroll_DetailImageScale.ValueChanged += new System.EventHandler(this.scroll_DetailImageScale_ValueChanged);
+            this.scroll_DetailImageScale.ValueChanged += new System.EventHandler(this.scroll_DetailImageScale_ValueChanged);
             // 
             // text_Northing
             // 
             this.text_Northing.Name = "text_Northing";
             this.text_Northing.ForeColor = System.Drawing.SystemColors.WindowText;
             this.text_Northing.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.text_Northing.Location = new System.Drawing.Point(616, 424);
+            this.text_Northing.Location = new System.Drawing.Point(128, 413);
             this.text_Northing.TabIndex = 5;
+            this.text_Northing.Anchor = (System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right);
             this.text_Northing.Size = new System.Drawing.Size(96, 20);
             this.text_Northing.MaxLength = 6;
             this.text_Northing.BackColor = System.Drawing.SystemColors.Window;
@@ -159,9 +170,10 @@ namespace SamMapTool
             // 
             this.label_Northing.Name = "label_Northing";
             this.label_Northing.ForeColor = System.Drawing.SystemColors.InfoText;
-            this.label_Northing.Location = new System.Drawing.Point(552, 424);
+            this.label_Northing.Location = new System.Drawing.Point(66, 417);
             this.label_Northing.Image = null;
             this.label_Northing.TabIndex = 5;
+            this.label_Northing.Anchor = (System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right);
             this.label_Northing.Size = new System.Drawing.Size(56, 20);
             this.label_Northing.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
             this.label_Northing.Text = "Northing:";
@@ -170,9 +182,10 @@ namespace SamMapTool
             // 
             this.label_Easting.Name = "label_Easting";
             this.label_Easting.ForeColor = System.Drawing.SystemColors.InfoText;
-            this.label_Easting.Location = new System.Drawing.Point(552, 392);
+            this.label_Easting.Location = new System.Drawing.Point(64, 385);
             this.label_Easting.Image = null;
             this.label_Easting.TabIndex = 5;
+            this.label_Easting.Anchor = (System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right);
             this.label_Easting.Size = new System.Drawing.Size(56, 20);
             this.label_Easting.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
             this.label_Easting.Text = "Easting:";
@@ -182,8 +195,9 @@ namespace SamMapTool
             this.text_Easting.Name = "text_Easting";
             this.text_Easting.ForeColor = System.Drawing.SystemColors.WindowText;
             this.text_Easting.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.text_Easting.Location = new System.Drawing.Point(616, 392);
+            this.text_Easting.Location = new System.Drawing.Point(128, 381);
             this.text_Easting.TabIndex = 4;
+            this.text_Easting.Anchor = (System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right);
             this.text_Easting.Size = new System.Drawing.Size(96, 20);
             this.text_Easting.MaxLength = 6;
             this.text_Easting.BackColor = System.Drawing.SystemColors.Window;
@@ -193,9 +207,10 @@ namespace SamMapTool
             // 
             this.label_Origin.Name = "label_Origin";
             this.label_Origin.ForeColor = System.Drawing.SystemColors.InfoText;
-            this.label_Origin.Location = new System.Drawing.Point(536, 490);
+            this.label_Origin.Location = new System.Drawing.Point(40, 479);
             this.label_Origin.Image = null;
             this.label_Origin.TabIndex = 5;
+            this.label_Origin.Anchor = (System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right);
             this.label_Origin.Size = new System.Drawing.Size(48, 20);
             this.label_Origin.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
             this.label_Origin.Text = "Origin:";
@@ -206,8 +221,9 @@ namespace SamMapTool
             this.text_ImageX.TabStop = false;
             this.text_ImageX.ForeColor = System.Drawing.SystemColors.WindowText;
             this.text_ImageX.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.text_ImageX.Location = new System.Drawing.Point(592, 608);
+            this.text_ImageX.Location = new System.Drawing.Point(590, 16);
             this.text_ImageX.TabIndex = 4;
+            this.text_ImageX.Anchor = (System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right);
             this.text_ImageX.Size = new System.Drawing.Size(64, 20);
             this.text_ImageX.ReadOnly = true;
             this.text_ImageX.MaxLength = 4;
@@ -219,8 +235,9 @@ namespace SamMapTool
             this.text_ImageY.TabStop = false;
             this.text_ImageY.ForeColor = System.Drawing.SystemColors.WindowText;
             this.text_ImageY.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.text_ImageY.Location = new System.Drawing.Point(680, 608);
+            this.text_ImageY.Location = new System.Drawing.Point(680, 16);
             this.text_ImageY.TabIndex = 5;
+            this.text_ImageY.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.text_ImageY.Size = new System.Drawing.Size(64, 20);
             this.text_ImageY.ReadOnly = true;
             this.text_ImageY.MaxLength = 4;
@@ -229,20 +246,22 @@ namespace SamMapTool
             // label_ImageY
             // 
             this.label_ImageY.Name = "label_ImageY";
-            this.label_ImageY.ForeColor = System.Drawing.SystemColors.InfoText;
-            this.label_ImageY.Location = new System.Drawing.Point(664, 610);
+            this.label_ImageY.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.label_ImageY.Location = new System.Drawing.Point(664, 18);
             this.label_ImageY.Image = null;
             this.label_ImageY.TabIndex = 0;
+            this.label_ImageY.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label_ImageY.Size = new System.Drawing.Size(16, 22);
-            this.label_ImageY.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
+            this.label_ImageY.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.label_ImageY.Text = "Y:";
             // 
             // button_DetailImageTrack
             // 
             this.button_DetailImageTrack.Name = "button_DetailImageTrack";
             this.button_DetailImageTrack.ForeColor = System.Drawing.SystemColors.InfoText;
-            this.button_DetailImageTrack.Location = new System.Drawing.Point(552, 12);
+            this.button_DetailImageTrack.Location = new System.Drawing.Point(596, 12);
             this.button_DetailImageTrack.TabIndex = 2;
+            this.button_DetailImageTrack.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.button_DetailImageTrack.Size = new System.Drawing.Size(75, 24);
             this.button_DetailImageTrack.ImeMode = System.Windows.Forms.ImeMode.Disable;
             this.button_DetailImageTrack.BackColor = System.Drawing.SystemColors.ControlLight;
@@ -254,8 +273,9 @@ namespace SamMapTool
             // 
             this.button_DrawPoints.Name = "button_DrawPoints";
             this.button_DrawPoints.ForeColor = System.Drawing.SystemColors.InfoText;
-            this.button_DrawPoints.Location = new System.Drawing.Point(632, 12);
+            this.button_DrawPoints.Location = new System.Drawing.Point(516, 12);
             this.button_DrawPoints.TabIndex = 3;
+            this.button_DrawPoints.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.button_DrawPoints.Size = new System.Drawing.Size(75, 24);
             this.button_DrawPoints.ImeMode = System.Windows.Forms.ImeMode.Disable;
             this.button_DrawPoints.BackColor = System.Drawing.SystemColors.ControlLight;
@@ -267,8 +287,9 @@ namespace SamMapTool
             // 
             this.button_EnterEastingNorthing.Name = "button_EnterEastingNorthing";
             this.button_EnterEastingNorthing.ForeColor = System.Drawing.SystemColors.InfoText;
-            this.button_EnterEastingNorthing.Location = new System.Drawing.Point(568, 456);
+            this.button_EnterEastingNorthing.Location = new System.Drawing.Point(72, 440);
             this.button_EnterEastingNorthing.TabIndex = 6;
+            this.button_EnterEastingNorthing.Anchor = (System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right);
             this.button_EnterEastingNorthing.Size = new System.Drawing.Size(152, 24);
             this.button_EnterEastingNorthing.ImeMode = System.Windows.Forms.ImeMode.Disable;
             this.button_EnterEastingNorthing.BackColor = System.Drawing.SystemColors.ControlLight;
@@ -279,12 +300,13 @@ namespace SamMapTool
             // label_ImageX
             // 
             this.label_ImageX.Name = "label_ImageX";
-            this.label_ImageX.ForeColor = System.Drawing.SystemColors.InfoText;
-            this.label_ImageX.Location = new System.Drawing.Point(576, 608);
+            this.label_ImageX.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.label_ImageX.Location = new System.Drawing.Point(574, 18);
             this.label_ImageX.Image = null;
             this.label_ImageX.TabIndex = 0;
+            this.label_ImageX.Anchor = (System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right);
             this.label_ImageX.Size = new System.Drawing.Size(16, 20);
-            this.label_ImageX.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
+            this.label_ImageX.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.label_ImageX.Text = "X:";
             // 
             // text_OriginX
@@ -293,8 +315,9 @@ namespace SamMapTool
             this.text_OriginX.TabStop = false;
             this.text_OriginX.ForeColor = System.Drawing.SystemColors.WindowText;
             this.text_OriginX.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.text_OriginX.Location = new System.Drawing.Point(592, 488);
+            this.text_OriginX.Location = new System.Drawing.Point(96, 477);
             this.text_OriginX.TabIndex = 4;
+            this.text_OriginX.Anchor = (System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right);
             this.text_OriginX.Size = new System.Drawing.Size(72, 20);
             this.text_OriginX.ReadOnly = true;
             this.text_OriginX.MaxLength = 4;
@@ -306,8 +329,9 @@ namespace SamMapTool
             this.text_OriginY.TabStop = false;
             this.text_OriginY.ForeColor = System.Drawing.SystemColors.WindowText;
             this.text_OriginY.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.text_OriginY.Location = new System.Drawing.Point(670, 488);
+            this.text_OriginY.Location = new System.Drawing.Point(174, 477);
             this.text_OriginY.TabIndex = 4;
+            this.text_OriginY.Anchor = (System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right);
             this.text_OriginY.Size = new System.Drawing.Size(72, 20);
             this.text_OriginY.ReadOnly = true;
             this.text_OriginY.MaxLength = 4;
@@ -317,9 +341,10 @@ namespace SamMapTool
             // 
             this.label_Scale.Name = "label_Scale";
             this.label_Scale.ForeColor = System.Drawing.SystemColors.InfoText;
-            this.label_Scale.Location = new System.Drawing.Point(536, 520);
+            this.label_Scale.Location = new System.Drawing.Point(40, 509);
             this.label_Scale.Image = null;
             this.label_Scale.TabIndex = 5;
+            this.label_Scale.Anchor = (System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right);
             this.label_Scale.Size = new System.Drawing.Size(48, 20);
             this.label_Scale.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
             this.label_Scale.Text = "Scale:";
@@ -330,8 +355,9 @@ namespace SamMapTool
             this.text_ScaleX.TabStop = false;
             this.text_ScaleX.ForeColor = System.Drawing.SystemColors.WindowText;
             this.text_ScaleX.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.text_ScaleX.Location = new System.Drawing.Point(592, 518);
+            this.text_ScaleX.Location = new System.Drawing.Point(96, 507);
             this.text_ScaleX.TabIndex = 4;
+            this.text_ScaleX.Anchor = (System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right);
             this.text_ScaleX.Size = new System.Drawing.Size(72, 20);
             this.text_ScaleX.ReadOnly = true;
             this.text_ScaleX.MaxLength = 4;
@@ -343,8 +369,9 @@ namespace SamMapTool
             this.text_ScaleY.TabStop = false;
             this.text_ScaleY.ForeColor = System.Drawing.SystemColors.WindowText;
             this.text_ScaleY.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.text_ScaleY.Location = new System.Drawing.Point(670, 518);
+            this.text_ScaleY.Location = new System.Drawing.Point(174, 507);
             this.text_ScaleY.TabIndex = 4;
+            this.text_ScaleY.Anchor = (System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right);
             this.text_ScaleY.Size = new System.Drawing.Size(72, 20);
             this.text_ScaleY.ReadOnly = true;
             this.text_ScaleY.MaxLength = 4;
@@ -356,6 +383,7 @@ namespace SamMapTool
             this.button_Save.ForeColor = System.Drawing.SystemColors.InfoText;
             this.button_Save.Location = new System.Drawing.Point(184, 12);
             this.button_Save.TabIndex = 1;
+            this.button_Save.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.button_Save.Size = new System.Drawing.Size(75, 24);
             this.button_Save.ImeMode = System.Windows.Forms.ImeMode.Disable;
             this.button_Save.BackColor = System.Drawing.SystemColors.ControlLight;
@@ -367,7 +395,7 @@ namespace SamMapTool
             // 
             this.button_Help.Name = "button_Help";
             this.button_Help.ForeColor = System.Drawing.SystemColors.InfoText;
-            this.button_Help.Location = new System.Drawing.Point(272, 12);
+            this.button_Help.Location = new System.Drawing.Point(662, 12);
             this.button_Help.TabIndex = 1;
             this.button_Help.Size = new System.Drawing.Size(75, 24);
             this.button_Help.ImeMode = System.Windows.Forms.ImeMode.Disable;
@@ -380,9 +408,10 @@ namespace SamMapTool
             // 
             this.label_North.Name = "label_North";
             this.label_North.ForeColor = System.Drawing.SystemColors.InfoText;
-            this.label_North.Location = new System.Drawing.Point(536, 552);
+            this.label_North.Location = new System.Drawing.Point(42, 567);
             this.label_North.Image = null;
             this.label_North.TabIndex = 5;
+            this.label_North.Anchor = (System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right);
             this.label_North.Size = new System.Drawing.Size(48, 20);
             this.label_North.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
             this.label_North.Text = "North:";
@@ -393,17 +422,19 @@ namespace SamMapTool
             this.scroll_North.Tag = "";
             this.scroll_North.Size = new System.Drawing.Size(128, 20);
             this.scroll_North.Name = "scroll_North";
-            this.scroll_North.Location = new System.Drawing.Point(584, 552);
+            this.scroll_North.Location = new System.Drawing.Point(104, 571);
+            this.scroll_North.Anchor = (System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right);
             this.scroll_North.Maximum = 1000;
             this.scroll_North.TabIndex = 0;
-						this.scroll_North.ValueChanged += new System.EventHandler(this.scroll_North_ValueChanged);
+            this.scroll_North.ValueChanged += new System.EventHandler(this.scroll_North_ValueChanged);
             // 
             // button_North
             // 
             this.button_North.Name = "button_North";
             this.button_North.ForeColor = System.Drawing.SystemColors.InfoText;
-            this.button_North.Location = new System.Drawing.Point(356, 12);
+            this.button_North.Location = new System.Drawing.Point(326, 12);
             this.button_North.TabIndex = 2;
+            this.button_North.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.button_North.Size = new System.Drawing.Size(40, 24);
             this.button_North.ImeMode = System.Windows.Forms.ImeMode.Disable;
             this.button_North.BackColor = System.Drawing.SystemColors.ControlLight;
@@ -415,8 +446,9 @@ namespace SamMapTool
             // 
             this.button_Calibrate.Name = "button_Calibrate";
             this.button_Calibrate.ForeColor = System.Drawing.SystemColors.InfoText;
-            this.button_Calibrate.Location = new System.Drawing.Point(392, 12);
+            this.button_Calibrate.Location = new System.Drawing.Point(366, 12);
             this.button_Calibrate.TabIndex = 2;
+            this.button_Calibrate.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.button_Calibrate.Size = new System.Drawing.Size(64, 24);
             this.button_Calibrate.ImeMode = System.Windows.Forms.ImeMode.Disable;
             this.button_Calibrate.BackColor = System.Drawing.SystemColors.ControlLight;
@@ -428,8 +460,9 @@ namespace SamMapTool
             // 
             this.button_Trees.Name = "button_Trees";
             this.button_Trees.ForeColor = System.Drawing.SystemColors.InfoText;
-            this.button_Trees.Location = new System.Drawing.Point(456, 12);
+            this.button_Trees.Location = new System.Drawing.Point(430, 12);
             this.button_Trees.TabIndex = 2;
+            this.button_Trees.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.button_Trees.Size = new System.Drawing.Size(40, 24);
             this.button_Trees.ImeMode = System.Windows.Forms.ImeMode.Disable;
             this.button_Trees.BackColor = System.Drawing.SystemColors.ControlLight;
@@ -437,37 +470,61 @@ namespace SamMapTool
             this.button_Trees.UseVisualStyleBackColor = true;
             this.button_Trees.Click += new System.EventHandler(this.button_Trees_Click);
             // 
+            // panel_Bottom
+            // 
+            this.panel_Bottom.Name = "panel_Bottom";
+            this.panel_Bottom.Location = new System.Drawing.Point(0, 601);
+            this.panel_Bottom.TabIndex = 7;
+            this.panel_Bottom.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panel_Bottom.Controls.Add(this.text_Status);
+            this.panel_Bottom.Controls.Add(this.label_ImageY);
+            this.panel_Bottom.Controls.Add(this.label_ImageX);
+            this.panel_Bottom.Controls.Add(this.text_ImageX);
+            this.panel_Bottom.Controls.Add(this.text_ImageY);
+            this.panel_Bottom.Size = new System.Drawing.Size(503, 48);
+            this.panel_Bottom.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.panel_Bottom.Text = "panel1";
+            // 
+            // panel_Right
+            // 
+            this.panel_Right.Name = "panel_Right";
+            this.panel_Right.Location = new System.Drawing.Point(503, 0);
+            this.panel_Right.TabIndex = 8;
+            this.panel_Right.Dock = System.Windows.Forms.DockStyle.Right;
+            this.panel_Right.Controls.Add(this.pictureBox_DetailImage);
+            this.panel_Right.Controls.Add(this.scroll_DetailImageScale);
+            this.panel_Right.Controls.Add(this.text_Easting);
+            this.panel_Right.Controls.Add(this.text_Northing);
+            this.panel_Right.Controls.Add(this.button_EnterEastingNorthing);
+            this.panel_Right.Controls.Add(this.label_Easting);
+            this.panel_Right.Controls.Add(this.label_Northing);
+            this.panel_Right.Controls.Add(this.label_Scale);
+            this.panel_Right.Controls.Add(this.text_ScaleX);
+            this.panel_Right.Controls.Add(this.text_OriginY);
+            this.panel_Right.Controls.Add(this.text_ScaleY);
+            this.panel_Right.Controls.Add(this.scroll_North);
+            this.panel_Right.Controls.Add(this.label_North);
+            this.panel_Right.Controls.Add(this.label_Origin);
+            this.panel_Right.Controls.Add(this.text_OriginX);
+            this.panel_Right.Size = new System.Drawing.Size(256, 649);
+            this.panel_Right.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.panel_Right.Text = "panel1";
+            // 
             // SamMapToolMain
             // 
             this.Name = "SamMapToolMain";
-            this.ClientSize = new System.Drawing.Size(758, 645);
+            this.ClientSize = new System.Drawing.Size(759, 649);
             this.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
+            this.Controls.Add(this.panel_Right);
             this.Controls.Add(this.panel_Top);
+            this.Controls.Add(this.panel_Bottom);
             this.Controls.Add(this.picturebox_DisplayImage);
-            this.Controls.Add(this.text_Status);
-            this.Controls.Add(this.pictureBox_DetailImage);
-            this.Controls.Add(this.scroll_DetailImageScale);
-            this.Controls.Add(this.text_Northing);
-            this.Controls.Add(this.label_Northing);
-            this.Controls.Add(this.label_Easting);
-            this.Controls.Add(this.text_Easting);
-            this.Controls.Add(this.label_Origin);
-            this.Controls.Add(this.text_ImageX);
-            this.Controls.Add(this.text_ImageY);
-            this.Controls.Add(this.label_ImageY);
-            this.Controls.Add(this.button_EnterEastingNorthing);
-            this.Controls.Add(this.label_ImageX);
-            this.Controls.Add(this.text_OriginX);
-            this.Controls.Add(this.text_OriginY);
-            this.Controls.Add(this.label_Scale);
-            this.Controls.Add(this.text_ScaleX);
-            this.Controls.Add(this.text_ScaleY);
-            this.Controls.Add(this.label_North);
-            this.Controls.Add(this.scroll_North);
             this.KeyPreview = true;
             this.Text = "Sam's Map Tool";
             this.HelpButton = true;
             this.panel_Top.ResumeLayout(false);
+            this.panel_Bottom.ResumeLayout(false);
+            this.panel_Right.ResumeLayout(false);
         }
         private System.Windows.Forms.Panel panel_Top;
         private System.Windows.Forms.Button button_Quit;
@@ -500,6 +557,8 @@ namespace SamMapTool
         private System.Windows.Forms.Button button_North;
         private System.Windows.Forms.Button button_Calibrate;
         private System.Windows.Forms.Button button_Trees;
+        private System.Windows.Forms.Panel panel_Bottom;
+        private System.Windows.Forms.Panel panel_Right;
     }
     #endregion
 }
