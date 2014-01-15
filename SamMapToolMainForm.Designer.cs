@@ -94,9 +94,16 @@ namespace SamMapTool
             this.picturebox_DisplayImage.TabIndex = 0;
 						this.picturebox_DisplayImage.Dock = System.Windows.Forms.DockStyle.Fill;
             this.picturebox_DisplayImage.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.picturebox_DisplayImage.Size = new System.Drawing.Size(512, 512);
+						this.picturebox_DisplayImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+						this.picturebox_DisplayImage.AutoSize = true;
             this.picturebox_DisplayImage.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.picturebox_DisplayImage.Text = "pictureBox1";
+						this.picturebox_DisplayImage.SizeChanged += new System.EventHandler(this.picturebox_DisplayImage_SizeChanged);
+						this.picturebox_DisplayImage.MouseMove += new System.Windows.Forms.MouseEventHandler(DisplayImage_MouseMove);
+						this.picturebox_DisplayImage.MouseDown += new System.Windows.Forms.MouseEventHandler(DisplayImage_MouseDown);
+						this.picturebox_DisplayImage.MouseUp += new System.Windows.Forms.MouseEventHandler(DisplayImage_MouseUp);
+						this.picturebox_DisplayImage.MouseClick += new System.Windows.Forms.MouseEventHandler(DisplayImage_MouseClick);
+						this.picturebox_DisplayImage.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(DisplayImage_MouseDoubleClick);
             // 
             // text_Status
             // 

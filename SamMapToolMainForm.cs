@@ -16,6 +16,7 @@ namespace SamMapTool
 		enum Mode { NORTH, CALIBRATE, TREES };
 		public SamMapToolMain()
 		{
+			m_displayGR = null;
 			InitializeComponent();
 			Init();
 		}
@@ -71,16 +72,24 @@ namespace SamMapTool
 			m_detailGR.InterpolationMode = InterpolationMode.HighQualityBicubic;
 			RefreshDetailImage();
 
-			this.picturebox_DisplayImage.MouseMove += new MouseEventHandler(DisplayImage_MouseMove);
-			this.picturebox_DisplayImage.MouseDown += new MouseEventHandler(DisplayImage_MouseDown);
-			this.picturebox_DisplayImage.MouseUp += new MouseEventHandler(DisplayImage_MouseUp);
-			this.picturebox_DisplayImage.MouseClick += new MouseEventHandler(DisplayImage_MouseClick);
-			this.picturebox_DisplayImage.MouseDoubleClick += new MouseEventHandler(DisplayImage_MouseDoubleClick);
-
 			this.KeyPress += new KeyPressEventHandler(this_KeyPress);
 
 			this.DoubleBuffered = true;
 			SetOriginScale();
+		}
+		private void picturebox_DisplayImage_SizeChanged (object sender, EventArgs e)
+		{
+			m_displayImageWidth = this.picturebox_DisplayImage.Width;
+			m_displayImageHeight = this.picturebox_DisplayImage.Height;
+			Bitmap newBitmap = new Bitmap(m_displayImageWidth, m_displayImageHeight);
+
+			m_displayImage = newBitmap;
+
+			if (m_displayGR != null)
+			{
+				m_displayGR = Graphics.FromImage(m_displayImage);
+				RefreshDisplayImage();
+			}
 		}
 		private void button_Quit_Click(object sender, EventArgs e)
 		{
