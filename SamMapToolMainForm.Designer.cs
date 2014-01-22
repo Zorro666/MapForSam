@@ -426,7 +426,7 @@ namespace SamMapTool
             this.scroll_North.Name = "scroll_North";
             this.scroll_North.Location = new System.Drawing.Point(104, 536);
             this.scroll_North.Anchor = (System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right);
-            this.scroll_North.Maximum = 1000;
+            this.scroll_North.Maximum = 1009;
             this.scroll_North.TabIndex = 0;
             this.scroll_North.ValueChanged += new System.EventHandler(this.scroll_North_ValueChanged);
             // 

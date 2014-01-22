@@ -732,6 +732,24 @@ namespace SamMapTool
 		private void scroll_North_ValueChanged(object sender, EventArgs e)
 		{
 			int value = this.scroll_North.Value;
+			if (m_settings.m_numNorthPoints == 2)
+			{
+				// Mid-point
+				int dX = (m_settings.m_northPoint1_X - m_settings.m_northPoint0_X);
+				int dY = (m_settings.m_northPoint1_Y - m_settings.m_northPoint0_Y);
+				int midX = m_settings.m_northPoint0_X + dX/2;
+				int midY = m_settings.m_northPoint0_Y + dY/2;
+				double len = Math.Sqrt(dX*dX + dY*dY) / 2.0;
+				// value = 0:1000 : 0:360 : 0:2PI
+				double angle = (Convert.ToDouble(value) / 1000.0) * 2.0*Math.PI;
+				double cosAngle = Math.Cos(angle);
+				double sinAngle = Math.Sin(angle);
+				m_settings.m_northPoint0_X = midX - Convert.ToInt32(len * sinAngle);
+				m_settings.m_northPoint0_Y = midY + Convert.ToInt32(len * cosAngle);
+				m_settings.m_northPoint1_X = midX + Convert.ToInt32(len * sinAngle);
+				m_settings.m_northPoint1_Y = midY - Convert.ToInt32(len * cosAngle);
+				RefreshDisplayImage();
+			}
 			SetDebugText("North:" + value);
 		}
 		private void scroll_DetailImageScale_ValueChanged(object sender, EventArgs e)

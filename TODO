@@ -1,5 +1,4 @@
 * north mode : system to choose north direction
-** use angle scroll to rotate line about its centre
 ** click either point to drag them around
 
 * apply north angle to rotate points about correctly
