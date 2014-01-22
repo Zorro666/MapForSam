@@ -22,6 +22,7 @@ namespace SamMapTool
 		}
 		private void Init()
 		{
+			m_selectedNorthPoint = -1;
 			m_settings.m_numNorthPoints = 0;
 			m_settings.m_northAngle = 0.0;
 			m_mouseCurX = 0;
@@ -331,12 +332,32 @@ namespace SamMapTool
 			if (m_mode == Mode.NORTH)
 			{
 				ComputeImageXY();
+				int pixelX = m_sourceImagePixelX;
+				int pixelY = m_sourceImagePixelY;
+				bool recompute = false;
 				if (m_settings.m_numNorthPoints == 1)
 				{
-					int pixelX = m_sourceImagePixelX;
-					int pixelY = m_sourceImagePixelY;
 					m_settings.m_northPoint1_X = pixelX;
 					m_settings.m_northPoint1_Y = pixelY;
+					recompute = true;
+				}
+				if (m_settings.m_numNorthPoints == 2)
+				{
+					if (m_selectedNorthPoint == 0)
+					{
+						m_settings.m_northPoint0_X = pixelX;
+						m_settings.m_northPoint0_Y = pixelY;
+						recompute = true;
+					}
+					if (m_selectedNorthPoint == 1)
+					{
+						m_settings.m_northPoint1_X = pixelX;
+						m_settings.m_northPoint1_Y = pixelY;
+						recompute = true;
+					}
+				}
+				if (recompute)
+				{
 					ComputeNorthAngle();
 					UpdateNorthScroll();
 					RefreshDisplayImage();
@@ -431,6 +452,28 @@ namespace SamMapTool
 				m_settings.m_numNorthPoints = 2;
 				m_settings.m_northPoint1_X = pixelX;
 				m_settings.m_northPoint1_Y = pixelY;
+			}
+			else if (m_settings.m_numNorthPoints == 2)
+			{
+				int maxSelX = 20;
+				int maxSelY = 20;
+				if (m_selectedNorthPoint == -1)
+				{
+					if ((Math.Abs(pixelX - m_settings.m_northPoint0_X) < maxSelX) && 
+							(Math.Abs(pixelY - m_settings.m_northPoint0_Y) < maxSelY))
+					{
+						m_selectedNorthPoint = 0;
+					}
+					else if ((Math.Abs(pixelX - m_settings.m_northPoint1_X) < maxSelX) && 
+								 	(Math.Abs(pixelY - m_settings.m_northPoint1_Y) < maxSelY))
+					{
+						m_selectedNorthPoint = 1;
+					}
+				}
+				else
+				{
+					m_selectedNorthPoint = -1;
+				}
 			}
 			RefreshDisplayImage();
 		}
@@ -713,6 +756,10 @@ namespace SamMapTool
 				this.button_Trees.BackColor = System.Drawing.SystemColors.ControlDark;
 				SetDebugText("Mode:TREES");
 			}
+			if (m_displayGR != null)
+			{
+				RefreshImages();
+			}
 		}
 		private void button_North_Click(object sender, EventArgs e)
 		{
@@ -732,7 +779,7 @@ namespace SamMapTool
 		private void scroll_North_ValueChanged(object sender, EventArgs e)
 		{
 			int value = this.scroll_North.Value;
-			if (m_settings.m_numNorthPoints == 2)
+			if ((m_settings.m_numNorthPoints == 2) && m_selectedNorthPoint == -1)
 			{
 				// Mid-point
 				int dX = (m_settings.m_northPoint1_X - m_settings.m_northPoint0_X);
@@ -801,11 +848,26 @@ namespace SamMapTool
 				Vector2 end = new Vector2(m_settings.m_northPoint1_X, m_settings.m_northPoint1_Y);
 				if (m_mode == Mode.NORTH)
 				{
-					Pen pointColour = new Pen(Color.Green, 1.5f);
+					Pen pointColour = new Pen(Color.Chartreuse, 2.5f);
+					Pen movePointColour = new Pen(Color.MediumSpringGreen, 3.5f);
+					Pen startColour = pointColour;
+					Pen endColour = pointColour;
 					int pointWidth = 20;
 					int pointHeight = 20;
-					DrawPoint(m_displayGR, start, pointColour, pointWidth, pointHeight, sX, sY, 1.0f/m_displayImageDisplayScale);
-					DrawPoint(m_displayGR, end, pointColour, pointWidth, pointHeight, sX, sY, 1.0f/m_displayImageDisplayScale);
+					if (m_selectedNorthPoint == 0)
+					{
+						startColour = movePointColour;
+					}
+					else if (m_selectedNorthPoint == 1)
+					{
+						endColour = movePointColour;
+					}
+					else if (m_settings.m_numNorthPoints == 1)
+					{
+						endColour = movePointColour;
+					}
+					DrawPoint(m_displayGR, start, startColour, pointWidth, pointHeight, sX, sY, 1.0f/m_displayImageDisplayScale);
+					DrawPoint(m_displayGR, end, endColour, pointWidth, pointHeight, sX, sY, 1.0f/m_displayImageDisplayScale);
 					Pen lineColour = Pens.Green;
 					DrawLine(m_displayGR, start, end, lineColour, sX, sY, 1.0f/m_displayImageDisplayScale);
 				}
@@ -1198,5 +1260,6 @@ namespace SamMapTool
 		private bool m_enterEastingNorthing;
 		private int m_mouseCurX;
 		private int m_mouseCurY;
+		private int m_selectedNorthPoint;
 	}
 }
