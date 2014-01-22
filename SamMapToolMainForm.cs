@@ -23,6 +23,7 @@ namespace SamMapTool
 		private void Init()
 		{
 			m_settings.m_numNorthPoints = 0;
+			m_settings.m_northAngle = 0.0;
 			m_mouseCurX = 0;
 			m_mouseCurY = 0;
 			m_enterEastingNorthing = false;
@@ -336,6 +337,8 @@ namespace SamMapTool
 					int pixelY = m_sourceImagePixelY;
 					m_settings.m_northPoint1_X = pixelX;
 					m_settings.m_northPoint1_Y = pixelY;
+					ComputeNorthAngle();
+					UpdateNorthScroll();
 					RefreshDisplayImage();
 				}
 			}
@@ -346,6 +349,20 @@ namespace SamMapTool
 				SetDebugText(text);
 			}
 		} 
+		private void ComputeNorthAngle()
+		{
+			if (m_settings.m_numNorthPoints > 1)
+			{
+			}
+		}
+		private void UpdateNorthScroll()
+		{
+			// m_northAngle is radians
+			// northValue = 0->1000 : 0->2*PI
+			double value = Math.Round((m_northAngle / (2.0*Math.PI)) * 1000.0f);
+			int northValue = (int)value;
+			this.scroll_North.Value = northValue;
+		}
 		private void DisplayImage_SingleClick (MouseEventArgs e)
 		{
 			if (m_mode == Mode.CALIBRATE)
@@ -869,6 +886,7 @@ namespace SamMapTool
 			public int m_northPoint0_Y;
 			public int m_northPoint1_X;
 			public int m_northPoint1_Y;
+			private double m_northAngle;
 
 			public bool Save(string fileName)
 			{
@@ -898,6 +916,8 @@ namespace SamMapTool
 					outputStream.WriteLine(m_northPoint0_X);
 					outputStream.WriteLine("NorthPoint1_Y");
 					outputStream.WriteLine(m_northPoint0_Y);
+					outputStream.WriteLine("NorthAngle");
+					outputStream.WriteLine(m_northAngle);
 					outputStream.WriteLine("NumPoints");
 					outputStream.WriteLine(m_points.Count);
 					for (int i = 0; i < m_points.Count; i++)
@@ -983,6 +1003,10 @@ namespace SamMapTool
 						else if (param == "NorthPoint1_Y")
 						{
 							m_northPoint1_Y = Convert.ToInt32(value);
+						}
+						else if (param == "NorthAngle")
+						{
+							m_northAngle = Convert.ToDouble(value);
 						}
 						else if (param == "NumPoints")
 						{

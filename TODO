@@ -1,4 +1,3 @@
-* put north scroll widget back onto UI
 * north mode : system to choose north direction
 ** after 1st click : update north angle scroll
 ** use angle scroll to rotate line about its centre
