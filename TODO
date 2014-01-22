@@ -1,8 +1,8 @@
 * north mode : system to choose north direction
-** after 1st click : update north angle scroll
 ** use angle scroll to rotate line about its centre
 ** click either point to drag them around
-** north mode : need nice draw arrow function
+
+* apply north angle to rotate points about correctly
 
 * system to enter scale value, lock the scale values
 * system to enter origin value, lock the origin values
@@ -14,3 +14,6 @@
 
 * Bredon Hill / Empress junction = 434638, 335093
 * Mount Carmell / St. Chads Road = 434881, 335051
+
+
+

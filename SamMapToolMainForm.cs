@@ -771,7 +771,7 @@ namespace SamMapTool
 			}
 			if (m_enterEastingNorthing == true)
 			{
-				Pen pointColour = Pens.Red;
+				Pen pointColour = new Pen(Color.Red, 1.5f);
 				int pointWidth = 20;
 				int pointHeight = 20;
 				Vector2 pixel = new Vector2(m_pointPixelX, m_pointPixelY);
@@ -779,14 +779,20 @@ namespace SamMapTool
 			}
 			if (m_settings.m_numNorthPoints > 0)
 			{
-				Pen pointColour = Pens.Green;
-				int pointWidth = 20;
-				int pointHeight = 20;
 				Vector2 start = new Vector2(m_settings.m_northPoint0_X, m_settings.m_northPoint0_Y);
-				DrawPoint(m_displayGR, start, pointColour, pointWidth, pointHeight, sX, sY, 1.0f/m_displayImageDisplayScale);
 				Vector2 end = new Vector2(m_settings.m_northPoint1_X, m_settings.m_northPoint1_Y);
-				DrawPoint(m_displayGR, end, pointColour, pointWidth, pointHeight, sX, sY, 1.0f/m_displayImageDisplayScale);
-				DrawLine(m_displayGR, start, end, pointColour, sX, sY, 1.0f/m_displayImageDisplayScale);
+				if (m_mode == Mode.NORTH)
+				{
+					Pen pointColour = new Pen(Color.Green, 1.5f);
+					int pointWidth = 20;
+					int pointHeight = 20;
+					DrawPoint(m_displayGR, start, pointColour, pointWidth, pointHeight, sX, sY, 1.0f/m_displayImageDisplayScale);
+					DrawPoint(m_displayGR, end, pointColour, pointWidth, pointHeight, sX, sY, 1.0f/m_displayImageDisplayScale);
+					Pen lineColour = Pens.Green;
+					DrawLine(m_displayGR, start, end, lineColour, sX, sY, 1.0f/m_displayImageDisplayScale);
+				}
+				Pen arrowColour = new Pen(Color.Blue, 3.0f);
+				DrawArrow(m_displayGR, start, end, arrowColour, sX, sY, 1.0f/m_displayImageDisplayScale);
 			}
 			picturebox_DisplayImage.Image = m_displayImage;
 		}
@@ -802,13 +808,39 @@ namespace SamMapTool
 				DrawPoint(gr, pixel, pointColour, pointWidth, pointHeight, x0, y0, scale);
 			}
 		}
-		private void DrawLine(Graphics gr, Vector2 start, Vector2 end, Pen pointColour, int x0, int y0, float scale)
+		private void DrawArrow (Graphics gr, Vector2 start, Vector2 end, Pen colour, int x0, int y0, float scale)
+		{
+			// Main line
+			DrawLine(gr, start, end, colour, x0, y0, scale);
+			// Arrow head
+			long dX = end.X - start.X;
+			long dY = end.Y - start.Y;
+
+			long head1_X = start.X + ((end.X + dY) - start.X) / 2;
+			long head1_Y = start.Y + ((end.Y - dX) - start.Y) / 2;
+			double headDX = head1_X - end.X;
+			double headDY = head1_Y - end.Y;
+			double len = Math.Sqrt(headDX * headDX + headDY * headDY);
+			if (len > 0)
+			{
+				headDX /= len;
+				headDY /= len;
+				double headLen = 20;
+				headDX *= headLen;
+				headDY *= headLen;
+				Vector2 head1 = new Vector2(end.X + Convert.ToInt64(headDX), end.Y + Convert.ToInt64(headDY));
+				DrawLine(gr, end, head1, colour, x0, y0, scale);
+				Vector2 head2 = new Vector2(end.X + Convert.ToInt64(headDY), end.Y - Convert.ToInt64(headDX));
+				DrawLine(gr, end, head2, colour, x0, y0, scale);
+			}
+		}
+		private void DrawLine(Graphics gr, Vector2 start, Vector2 end, Pen colour, int x0, int y0, float scale)
 		{
 			int xs = (int)((float)(start.X - x0) / scale);
 			int ys = (int)((float)(start.Y - y0) / scale);
 			int xe = (int)((float)(end.X - x0) / scale);
 			int ye = (int)((float)(end.Y - y0) / scale);
-			gr.DrawLine(pointColour, xs, ys, xe, ye);
+			gr.DrawLine(colour, xs, ys, xe, ye);
 		}
 		private void DrawPoint(Graphics gr, Vector2 pixel, Pen pointColour, int pointWidth, int pointHeight, int x0, int y0, float scale)
 		{
@@ -862,7 +894,7 @@ namespace SamMapTool
 			int halfH = dH / 2;
 			int cursorOffset = 3;
 			int cursorLen = 10;
-			Pen cursorColour = Pens.DarkRed;
+			Pen cursorColour = new Pen(Color.DarkRed, 2.0f);
     	m_detailGR.DrawLine(cursorColour, halfW, halfH - cursorOffset, halfW, halfH - cursorOffset - cursorLen);
     	m_detailGR.DrawLine(cursorColour, halfW, halfH + cursorOffset, halfW, halfH + cursorOffset + cursorLen);
     	m_detailGR.DrawLine(cursorColour, halfW - cursorOffset, halfH, halfW - cursorOffset - cursorLen, halfH);
