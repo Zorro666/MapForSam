@@ -351,16 +351,38 @@ namespace SamMapTool
 		} 
 		private void ComputeNorthAngle()
 		{
-			if (m_settings.m_numNorthPoints > 1)
+			double angle = 0.0;
+			if (m_settings.m_numNorthPoints > 0)
 			{
+				int dX = m_settings.m_northPoint1_X - m_settings.m_northPoint0_X;
+				int dY = m_settings.m_northPoint1_Y - m_settings.m_northPoint0_Y;
+				angle = Math.Atan2( Convert.ToDouble(dX), Convert.ToDouble(-dY));
+				m_settings.m_northAngle = angle;
 			}
 		}
-		private void UpdateNorthScroll()
+		private void UpdateNorthScroll ()
 		{
-			// m_northAngle is radians
-			// northValue = 0->1000 : 0->2*PI
-			double value = Math.Round((m_northAngle / (2.0*Math.PI)) * 1000.0f);
-			int northValue = (int)value;
+			// m_northAngle is radians : -PI -> PI
+			// northValue = 0->1000 : 0->360
+			double angle = m_settings.m_northAngle;
+			while (angle < 0.0)
+			{
+				angle += 2.0 * Math.PI;
+			}
+			while (angle >= 2.0*Math.PI)
+			{
+				angle -= 2.0 * Math.PI;
+			}
+			double value = Math.Round((angle / (2.0 * Math.PI)) * 1000.0f);
+			int northValue = Convert.ToInt32(value);
+			if (northValue < this.scroll_North.Minimum)
+			{
+				northValue = this.scroll_North.Minimum;
+			}
+			if (northValue > this.scroll_North.Maximum)
+			{
+				northValue = this.scroll_North.Maximum;
+			}
 			this.scroll_North.Value = northValue;
 		}
 		private void DisplayImage_SingleClick (MouseEventArgs e)
@@ -886,7 +908,7 @@ namespace SamMapTool
 			public int m_northPoint0_Y;
 			public int m_northPoint1_X;
 			public int m_northPoint1_Y;
-			private double m_northAngle;
+			public double m_northAngle;
 
 			public bool Save(string fileName)
 			{
