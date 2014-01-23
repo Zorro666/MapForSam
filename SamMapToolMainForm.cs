@@ -207,10 +207,19 @@ namespace SamMapTool
 			this.text_ImageX.Text = m_sourceImagePixelX.ToString();
 			this.text_ImageY.Text = m_sourceImagePixelY.ToString();
 		}
+		private void ComputeEastingNorthingPixel(float imageX, float imageY, ref float pixelX, ref float pixelY)
+		{
+			double angle = m_settings.m_northAngle;
+			float eastingPixel = imageX * (float)Math.Cos(angle) - imageY * (float)Math.Sin(angle);
+			float northingPixel = -1.0f * imageX * (float)Math.Sin(angle) - imageY * (float)Math.Cos(angle);
+			pixelX = eastingPixel;
+			pixelY = northingPixel;
+		}
 		private void ComputeEastingNorthing()
 		{
-			float eastingPixel = m_sourceImagePixelX;
-			float northingPixel = m_sourceImagePixelY;
+			float eastingPixel = 0.0f;
+			float northingPixel = 0.0f;
+			ComputeEastingNorthingPixel((float)m_sourceImagePixelX, (float)m_sourceImagePixelY, ref eastingPixel, ref northingPixel);
 			float easting = m_settings.m_eastingZero + eastingPixel * m_settings.m_eastingScale;
 			float northing = m_settings.m_northingZero + northingPixel * m_settings.m_northingScale;
 			m_easting = (int)Math.Round(easting);
@@ -236,6 +245,12 @@ namespace SamMapTool
 				Vector2 pixel = point.Pixel;
 				Vector2 eastingNorthing = point.EastingNorthing;
 
+				float eastingPixel = 0.0f;
+				float northingPixel = 0.0f;
+				ComputeEastingNorthingPixel((float)pixel.X, (float)pixel.Y, ref eastingPixel, ref northingPixel);
+				pixel.X = (long)eastingPixel;
+				pixel.Y = (long)northingPixel;
+				
 				// X = pixel
 				// Y = eastingNorthing
 				sumX.Add(pixel.X, pixel.Y);
