@@ -158,7 +158,6 @@ namespace SamMapTool
 			m_displayImageX = 0;
 			m_displayImageY = 0;
 			m_displayImageDisplayScale = 1.0f;
-			RefreshImages();
 
 			SetDebugText(string.Format("Loaded '{0}' {1} x {2}", fileName, m_loadedImageWidth, m_loadedImageHeight));
 			SetStatusText("Left Click or Ctrl+Left Click to select point");
@@ -168,6 +167,8 @@ namespace SamMapTool
 			this.Text = "Sam's Map Tool || " + fileName;
 			LoadSettings();
 			RefreshSettings();
+
+			RefreshImages();
 		}
 		private void RefreshSettings()
 		{
@@ -234,10 +235,17 @@ namespace SamMapTool
 				return;
 			}
 
-			Vector2 sumX = new Vector2(0, 0);
-			Vector2 sumY = new Vector2(0, 0);
-			Vector2 sumXY = new Vector2(0, 0);
-			Vector2 sumXX = new Vector2(0, 0);
+			float sumX_X = 0.0f;
+			float sumX_Y = 0.0f;
+
+			float sumY_X = 0.0f;
+			float sumY_Y = 0.0f;
+
+			float sumXY_X = 0.0f;
+			float sumXY_Y = 0.0f;
+
+			float sumXX_X = 0.0f;
+			float sumXX_Y = 0.0f;
 
 			for (int i = 0; i < n; i++)
 			{
@@ -248,16 +256,20 @@ namespace SamMapTool
 				float eastingPixel = 0.0f;
 				float northingPixel = 0.0f;
 				ComputeEastingNorthingPixel((float)pixel.X, (float)pixel.Y, ref eastingPixel, ref northingPixel);
-				pixel.X = (long)eastingPixel;
-				pixel.Y = (long)northingPixel;
 				
 				// X = pixel
 				// Y = eastingNorthing
-				sumX.Add(pixel.X, pixel.Y);
-				sumY.Add(eastingNorthing.X, eastingNorthing.Y);
+				sumX_X += eastingPixel;
+				sumX_Y += northingPixel;
 
-				sumXY.Add(pixel.X * eastingNorthing.X, pixel.Y * eastingNorthing.Y);
-				sumXX.Add(pixel.X * pixel.X, pixel.Y * pixel.Y);
+				sumY_X += (float)eastingNorthing.X;
+				sumY_Y += (float)eastingNorthing.Y;
+
+				sumXY_X += eastingPixel * (float)eastingNorthing.X;
+				sumXY_Y += northingPixel * (float)eastingNorthing.Y;
+
+				sumXX_X += eastingPixel * eastingPixel;
+				sumXX_Y += northingPixel * northingPixel;
 			}
 
 			// y = A * x + B
@@ -269,13 +281,13 @@ namespace SamMapTool
 
 			float denom;
 
-			denom = (sumXX.X - (sumX.X * sumX.X)/n);
-			m_settings.m_eastingScale = (sumXY.X - (sumX.X * sumY.X)/n) / denom;
-			m_settings.m_eastingZero = ((sumY.X - m_settings.m_eastingScale * sumX.X)) / n;
+			denom = (sumXX_X - (sumX_X * sumX_X)/n);
+			m_settings.m_eastingScale = (sumXY_X - (sumX_X * sumY_X)/n) / denom;
+			m_settings.m_eastingZero = ((sumY_X - m_settings.m_eastingScale * sumX_X)) / n;
 
-			denom = (sumXX.Y - (sumX.Y * sumX.Y)/n);
-			m_settings.m_northingScale = (sumXY.Y - (sumX.Y * sumY.Y)/n) / denom;
-			m_settings.m_northingZero = ((sumY.Y - m_settings.m_northingScale * sumX.Y)) / n;
+			denom = (sumXX_Y - (sumX_Y * sumX_Y)/n);
+			m_settings.m_northingScale = (sumXY_Y - (sumX_Y * sumY_Y)/n) / denom;
+			m_settings.m_northingZero = ((sumY_Y - m_settings.m_northingScale * sumX_Y)) / n;
 		}
 		private void AddNewEastingNorthing(int newEasting, int newNorthing, int pixelX, int pixelY)
 		{
@@ -752,10 +764,12 @@ namespace SamMapTool
 			this.button_North.BackColor = System.Drawing.SystemColors.ControlLight;
 			this.button_Calibrate.BackColor = System.Drawing.SystemColors.ControlLight;
 			this.button_Trees.BackColor = System.Drawing.SystemColors.ControlLight;
+			this.scroll_North.Enabled = true;
 
 			if (this.m_mode == Mode.NORTH)
 			{
 				this.button_North.Enabled = false;
+				this.scroll_North.Enabled = true;
 				this.button_North.BackColor = System.Drawing.SystemColors.ControlDark;
 				SetDebugText("Mode:NORTH");
 			}
@@ -789,10 +803,15 @@ namespace SamMapTool
 		private void button_Trees_Click(object sender, EventArgs e)
 		{
 			this.m_mode = Mode.TREES;
+			this.scroll_North.Enabled = false;
 			SetNorthCalibrateTreesState();
 		}
 		private void scroll_North_ValueChanged(object sender, EventArgs e)
 		{
+			if (m_mode != Mode.NORTH)
+			{
+				UpdateNorthScroll();
+			}
 			int value = this.scroll_North.Value;
 			if ((m_settings.m_numNorthPoints == 2) && m_selectedNorthPoint == -1)
 			{
@@ -1062,9 +1081,9 @@ namespace SamMapTool
 					outputStream.WriteLine("NorthPoint0_Y");
 					outputStream.WriteLine(m_northPoint0_Y);
 					outputStream.WriteLine("NorthPoint1_X");
-					outputStream.WriteLine(m_northPoint0_X);
+					outputStream.WriteLine(m_northPoint1_X);
 					outputStream.WriteLine("NorthPoint1_Y");
-					outputStream.WriteLine(m_northPoint0_Y);
+					outputStream.WriteLine(m_northPoint1_Y);
 					outputStream.WriteLine("NorthAngle");
 					outputStream.WriteLine(m_northAngle);
 					outputStream.WriteLine("NumPoints");
