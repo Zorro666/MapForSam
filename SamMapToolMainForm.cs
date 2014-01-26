@@ -114,6 +114,10 @@ namespace SamMapTool
 		}
 		private void button_Quit_Click(object sender, EventArgs e)
 		{
+			Quit();
+		}
+		private void Quit()
+		{
 			Application.Exit();
 		}
 		private void button_LoadImage_Click(object sender, EventArgs e)
@@ -820,6 +824,26 @@ namespace SamMapTool
 				{
 					DisplayImage_Zoom(+1.0f);
 				}
+				else if (k.KeyChar == 'n')
+				{
+					SwitchToNorthMode();
+				}
+				else if (k.KeyChar == 'c')
+				{
+					SwitchToCalibrationMode();
+				}
+				else if (k.KeyChar == 't')
+				{
+					SwitchToTreeMode();
+				}
+				else if (k.KeyChar == 'h')
+				{
+					ShowHelpDialog();
+				}
+				else if (k.KeyChar == 'q')
+				{
+					Quit();
+				}
 			}
 		}
 		private void ToggleDrawPoints()
@@ -918,21 +942,32 @@ namespace SamMapTool
 				RefreshImages();
 			}
 		}
-		private void button_North_Click(object sender, EventArgs e)
+		private void SwitchToNorthMode()
 		{
 			this.m_mode = Mode.NORTH;
 			SetNorthCalibrateTreesState();
 		}
-		private void button_Calibrate_Click(object sender, EventArgs e)
+		private void SwitchToCalibrationMode()
 		{
 			this.m_mode = Mode.CALIBRATE;
 			SetNorthCalibrateTreesState();
 		}
-		private void button_Trees_Click(object sender, EventArgs e)
+		private void SwitchToTreeMode()
 		{
 			this.m_mode = Mode.TREES;
-			this.scroll_North.Enabled = false;
 			SetNorthCalibrateTreesState();
+		}
+		private void button_North_Click(object sender, EventArgs e)
+		{
+			SwitchToNorthMode();
+		}
+		private void button_Calibrate_Click(object sender, EventArgs e)
+		{
+			SwitchToCalibrationMode();
+		}
+		private void button_Trees_Click(object sender, EventArgs e)
+		{
+			SwitchToTreeMode();
 		}
 		private void scroll_North_ValueChanged (object sender, EventArgs e)
 		{
