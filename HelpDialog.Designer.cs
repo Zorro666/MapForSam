@@ -27,16 +27,16 @@ namespace SamMapTool
             this.richTextBox1.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.richTextBox1.Location = new System.Drawing.Point(16, 24);
             this.richTextBox1.TabIndex = 0;
-            this.richTextBox1.Size = new System.Drawing.Size(512, 392);
+            this.richTextBox1.Size = new System.Drawing.Size(612, 402);
             this.richTextBox1.BackColor = System.Drawing.SystemColors.Window;
             this.richTextBox1.Text = "richTextBox1";
             // 
             // button_OK
             // 
             this.button_OK.Name = "button_OK";
-            this.button_OK.Location = new System.Drawing.Point(240, 432);
+            this.button_OK.Location = new System.Drawing.Point(200, 432);
             this.button_OK.TabIndex = 1;
-            this.button_OK.Size = new System.Drawing.Size(60, 36);
+            this.button_OK.Size = new System.Drawing.Size(250, 36);
             this.button_OK.ImeMode = System.Windows.Forms.ImeMode.Disable;
             this.button_OK.Text = "OK";
             this.button_OK.UseVisualStyleBackColor = true;
@@ -45,7 +45,7 @@ namespace SamMapTool
             // HelpDialog
             // 
             this.Name = "HelpDialog";
-            this.ClientSize = new System.Drawing.Size(545, 476);
+            this.ClientSize = new System.Drawing.Size(650, 470);
             this.Controls.Add(this.richTextBox1);
             this.Controls.Add(this.button_OK);
             this.Text = "HelpDialog";
