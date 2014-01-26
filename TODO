@@ -3,7 +3,11 @@
 ** 270 deg
 ** 45 deg
 
-* recompute line fit if north angle changes
+* keyboard shortcuts: n - north mode, c - calibration mode, t - trees mode
+
+* north mode - highlight point if hovering over it
+* calibration mode - highlight a point if hovering over it
+* trees mode - highlight a point if hovering over it
 
 * auto-save after adding a calibration point
 * auto-save after setting a north angle
@@ -16,8 +20,6 @@
 
 * trees mode : output tree inputs as nice output file
 ** output file format update for sam as he needs
-
-* keyboard shortcuts: zoom in/out, toggle tracking
 
 * Bredon Hill / Empress junction = 434638, 335093
 * Mount Carmell / St. Chads Road = 434881, 335051

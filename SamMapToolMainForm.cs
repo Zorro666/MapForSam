@@ -193,6 +193,7 @@ namespace SamMapTool
 			RefreshDetailImage();
 			RefreshDisplayImage();
 			SetOriginScale();
+			SetEastingNorthingText();
 			UpdateNorthScroll();
 			UpdateNorthText();
 		}
@@ -270,7 +271,9 @@ namespace SamMapTool
 				float eastingPixel = 0.0f;
 				float northingPixel = 0.0f;
 				ComputeEastingNorthingPixel((float)pixel.X, (float)pixel.Y, ref eastingPixel, ref northingPixel);
-				
+				Console.WriteLine("North:"+m_settings.m_northAngle.ToString());
+				Console.WriteLine(eastingPixel.ToString() + ","+northingPixel.ToString());
+
 				// X = pixel
 				// Y = eastingNorthing
 				sumX_X += eastingPixel;
@@ -302,6 +305,8 @@ namespace SamMapTool
 			denom = (sumXX_Y - (sumX_Y * sumX_Y)/n);
 			m_settings.m_northingScale = (sumXY_Y - (sumX_Y * sumY_Y)/n) / denom;
 			m_settings.m_northingZero = ((sumY_Y - m_settings.m_northingScale * sumX_Y)) / n;
+			Console.WriteLine("Zero:"+m_settings.m_northingZero.ToString() + ","+m_settings.m_eastingZero.ToString());
+			Console.WriteLine("Scale:"+m_settings.m_northingScale.ToString() + ","+m_settings.m_eastingScale.ToString());
 		}
 		private void AddNewEastingNorthing(int newEasting, int newNorthing, int pixelX, int pixelY)
 		{
@@ -424,6 +429,7 @@ namespace SamMapTool
 				angle = Math.Atan2( Convert.ToDouble(dX), Convert.ToDouble(-dY));
 				m_settings.m_northAngle = angle;
 				ComputeBestFitEastingNorthing();
+				SetOriginScale();
 			}
 		}
 		private void UpdateNorthScroll ()
@@ -802,9 +808,17 @@ namespace SamMapTool
 				{
 					ToggleDrawPoints();
 				}
-				if (k.KeyChar == 'l')
+				else if (k.KeyChar == 'l')
 				{
 					ToggleDetailImageTrack();
+				}
+				else if (k.KeyChar == '-')
+				{
+					DisplayImage_Zoom(-1.0f);
+				}
+				else if (k.KeyChar == '=')
+				{
+					DisplayImage_Zoom(+1.0f);
 				}
 			}
 		}
@@ -954,6 +968,8 @@ namespace SamMapTool
 			}
 			UpdateNorthText();
 			ComputeBestFitEastingNorthing();
+			SetOriginScale();
+			SetEastingNorthingText();
 			SetDebugText("North:" + value);
 		}
 		private void scroll_DetailImageScale_ValueChanged(object sender, EventArgs e)
@@ -1232,7 +1248,7 @@ namespace SamMapTool
 					outputStream.WriteLine("NorthPoint1_Y");
 					outputStream.WriteLine(m_northPoint1_Y);
 					outputStream.WriteLine("NorthAngle");
-					outputStream.WriteLine(m_northAngle);
+					outputStream.WriteLine(m_northAngle*180.0f/Math.PI);
 					outputStream.WriteLine("NumPoints");
 					outputStream.WriteLine(m_points.Count);
 					for (int i = 0; i < m_points.Count; i++)
@@ -1321,7 +1337,7 @@ namespace SamMapTool
 						}
 						else if (param == "NorthAngle")
 						{
-							m_northAngle = Convert.ToDouble(value);
+							m_northAngle = Convert.ToDouble(value) * Math.PI / 180.0f;
 						}
 						else if (param == "NumPoints")
 						{
