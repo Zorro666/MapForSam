@@ -17,16 +17,22 @@ namespace SamMapTool
 		public SamMapToolMain()
 		{
 			m_displayGR = null;
+			m_detailGR = null;
 			InitializeComponent();
 			Init();
 		}
 		private void Init()
 		{
+			m_useTimerDoubleClick = false;
 			m_selectedNorthPoint = -1;
 			m_settings.m_numNorthPoints = 0;
 			m_settings.m_northAngle = 0.0;
 			m_mouseCurX = 0;
 			m_mouseCurY = 0;
+			m_mouseDownX = 0;
+			m_mouseDownY = 0;
+			m_mousePixelX = 0;
+			m_mousePixelY = 0;
 			m_enterEastingNorthing = false;
 			m_mode = Mode.CALIBRATE;
 			SetNorthCalibrateTreesState();
@@ -81,8 +87,11 @@ namespace SamMapTool
 			this.picturebox_DisplayImage.MouseMove += new System.Windows.Forms.MouseEventHandler(DisplayImage_MouseMove);
 			this.picturebox_DisplayImage.MouseDown += new System.Windows.Forms.MouseEventHandler(DisplayImage_MouseDown);
 			this.picturebox_DisplayImage.MouseUp += new System.Windows.Forms.MouseEventHandler(DisplayImage_MouseUp);
+			this.picturebox_DisplayImage.MouseWheel += new System.Windows.Forms.MouseEventHandler(DisplayImage_MouseWheel);
 			this.picturebox_DisplayImage.MouseClick += new System.Windows.Forms.MouseEventHandler(DisplayImage_MouseClick);
 			this.picturebox_DisplayImage.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(DisplayImage_MouseDoubleClick);
+			this.picturebox_DisplayImage.MouseLeave += new System.EventHandler(DisplayImage_MouseLeave);
+			this.picturebox_DisplayImage.MouseEnter += new System.EventHandler(DisplayImage_MouseEnter);
 
 			this.KeyPress += new KeyPressEventHandler(this_KeyPress);
 
@@ -167,11 +176,14 @@ namespace SamMapTool
 			this.Text = "Sam's Map Tool || " + fileName;
 			LoadSettings();
 			RefreshSettings();
+			ComputeBestFitEastingNorthing();
 
 			RefreshImages();
 		}
 		private void RefreshSettings()
 		{
+			UpdateNorthScroll();
+			UpdateNorthText();
 			SetDetailImageTrackButtonState();
 			SetDrawPointsButtonState();
 			SetOriginScale();
@@ -181,6 +193,8 @@ namespace SamMapTool
 			RefreshDetailImage();
 			RefreshDisplayImage();
 			SetOriginScale();
+			UpdateNorthScroll();
+			UpdateNorthText();
 		}
 		private void SetOriginScale()
 		{
@@ -229,7 +243,7 @@ namespace SamMapTool
 		private void ComputeBestFitEastingNorthing()
 		{
 			int n = m_settings.m_points.Count;
-			if (n == 1)
+			if (n < 1)
 			{
 				SetStatusText("Need more than one Easting, Northing setting");
 				return;
@@ -344,13 +358,14 @@ namespace SamMapTool
 			m_mouseCurY = curY;
 			if (m_dragging) 
 			{
-				m_displayImageX -= (curX - m_dragX);
-				m_displayImageY -= (curY - m_dragY);
+				int dX = curX - m_dragX;
+				int dY = curY - m_dragY;
+				m_displayImageX -= dX;
+				m_displayImageY -= dY;
+				m_detailImageX += dX;
+				m_detailImageY += dY;
 				UpdateDisplayImage();
-				if (m_enterEastingNorthing == true)
-				{
-					EndEnterEastingNorthing();
- 				}
+				EndEnterEastingNorthing();
 			} 
 			else if (m_settings.m_detailImageTrack)
 			{
@@ -387,6 +402,7 @@ namespace SamMapTool
 				{
 					ComputeNorthAngle();
 					UpdateNorthScroll();
+					UpdateNorthText();
 					RefreshDisplayImage();
 				}
 			}
@@ -396,6 +412,7 @@ namespace SamMapTool
 				string text = e.Location.ToString();
 				SetDebugText(text);
 			}
+			RefreshImages();
 		} 
 		private void ComputeNorthAngle()
 		{
@@ -406,6 +423,7 @@ namespace SamMapTool
 				int dY = m_settings.m_northPoint1_Y - m_settings.m_northPoint0_Y;
 				angle = Math.Atan2( Convert.ToDouble(dX), Convert.ToDouble(-dY));
 				m_settings.m_northAngle = angle;
+				ComputeBestFitEastingNorthing();
 			}
 		}
 		private void UpdateNorthScroll ()
@@ -432,20 +450,36 @@ namespace SamMapTool
 				northValue = this.scroll_North.Maximum;
 			}
 			this.scroll_North.Value = northValue;
+			UpdateNorthText();
+		}
+		private void UpdateNorthText()
+		{
+			int northValue = this.scroll_North.Value;
+			double degs = (Convert.ToDouble(northValue) / 1000.0) * 360.0;
+			degs = Math.Round(degs * 10.0) / 10.0;
+			this.text_North.Text = degs.ToString();
 		}
 		private void DisplayImage_SingleClick (MouseEventArgs e)
 		{
+			SetDebugText("Single-click:" + e.Button);
+			bool lockToggle = false;
+			if (e.Button == MOUSE_BUTTON_DETAIL_LOCK_TOGGLE2)
+			{
+				lockToggle = true;
+			}
+			else if ((e.Button == MOUSE_BUTTON_DETAIL_LOCK_TOGGLE) && (Control.ModifierKeys == Keys.Control))
+			{
+				lockToggle = true;
+			}
+			if (lockToggle)
+			{
+				ToggleDetailImageTrack();
+				EndEnterEastingNorthing();
+				return;
+			}
 			if (m_mode == Mode.CALIBRATE)
 			{
-				if (e.Button == MOUSE_BUTTON_DETAIL_LOCK_TOGGLE)
-				{
-					ToggleDetailImageTrack();
-					if (m_enterEastingNorthing == true)
-					{
-						EndEnterEastingNorthing();
- 					}
-				}
-				else if ((e.Button == MOUSE_BUTTON_ENTER_EASTING_NORTHING) && (Control.ModifierKeys == Keys.Control))
+				if ((e.Button == MOUSE_BUTTON_ENTER_EASTING_NORTHING) && (Control.ModifierKeys == Keys.Control))
 				{
 					EnterEastingNorthing(true);
 				}
@@ -453,10 +487,17 @@ namespace SamMapTool
 				{
 					EnterEastingNorthing(false);
 				}
+				else
+				{
+					EndEnterEastingNorthing();
+				}
 			}
 			else if (m_mode == Mode.NORTH)
 			{
-				EnterNorthPoint();
+				if (e.Button == MOUSE_BUTTON_ENTER_NORTHPOINT)
+				{
+					EnterNorthPoint();
+				}
 			}
 			else if (m_mode == Mode.TREES)
 			{
@@ -506,8 +547,11 @@ namespace SamMapTool
 		}
 		private void EndEnterEastingNorthing()
 		{
+			if (m_enterEastingNorthing == true)
+			{
+				m_settings.m_detailImageTrack = true;
+			}
 			m_enterEastingNorthing = false;
-			m_settings.m_detailImageTrack = true;
 
 			ComputeImageXY();
 			UpdateDetailImage();
@@ -517,25 +561,25 @@ namespace SamMapTool
 		}
 		private void DisplayImage_DoubleClick (MouseEventArgs e)
 		{
-			if (m_enterEastingNorthing == true)
+			if (e.Button == MOUSE_BUTTON_ENTER_EASTINGNORTHING)
 			{
 				EndEnterEastingNorthing();
- 			}
-			float displayScale = m_displayImageDisplayScale;
+			}
 			SetDebugText("Double-click:" + e.Button);
 			float zoomAmount = 0.0f;
-			if (e.Button == MouseButtons.Left)
+			if (e.Button == MOUSE_BUTTON_ZOOM)
 			{
 				zoomAmount = 1.0f;
+				if (Control.ModifierKeys == Keys.Shift)
+				{
+					zoomAmount *= -1.0f;
+				}
+				DisplayImage_Zoom(zoomAmount);
 			}
-			else if (e.Button == MouseButtons.Right)
-			{
-				zoomAmount = -1.0f;
-			}
-			if (Control.ModifierKeys == Keys.Shift)
-			{
-				zoomAmount *= -1.0f;
-			}
+		}
+		private void DisplayImage_Zoom(float zoomAmount)
+		{
+			float displayScale = m_displayImageDisplayScale;
 			bool invert = false;
 			if (displayScale < 1.0f)
 			{
@@ -587,6 +631,10 @@ namespace SamMapTool
 		}
 		private void ClickTimer_Tick(object sender, EventArgs e)
 		{
+			if (m_useTimerDoubleClick == false)
+			{
+				return;
+			}
 			DateTime now = DateTime.Now;
 			m_clickTimerMS += (now - m_now).Milliseconds;
 			m_now = now;
@@ -604,27 +652,54 @@ namespace SamMapTool
 		}
 		private void DisplayImage_MouseDown(object sender, MouseEventArgs e)
 		{
+			m_mouseDownX = e.Location.X;
+			m_mouseDownY = e.Location.Y;
 			if (e.Button == MOUSE_BUTTON_DRAG)
 			{
 				m_dragging = true;
-				m_dragX = e.Location.X;
-				m_dragY = e.Location.Y;
+				m_dragX = m_mouseDownX;
+				m_dragY = m_mouseDownY;
 				this.Cursor = Cursors.Cross;
 				SetDebugText("Dragging Start " + e.Location.ToString());
 			}
 			m_downMouseEventArgs = e;
 		}
+		void DisplayImage_MouseLeave(object sender, EventArgs e)
+		{
+    	if (this.picturebox_DisplayImage.Focused)
+        	this.picturebox_DisplayImage.Parent.Focus();
+		}
+		void DisplayImage_MouseEnter(object sender, EventArgs e)
+		{
+    	if (!this.picturebox_DisplayImage.Focused)
+        	this.picturebox_DisplayImage.Focus();
+		}
+		private void DisplayImage_MouseWheel(object sender, MouseEventArgs e)
+		{
+			int scrollLines = e.Delta * SystemInformation.MouseWheelScrollLines / 120;
+			SetDebugText("Wheel:" + scrollLines.ToString() + ":" + e.Delta.ToString());
+			float zoomAmount = 0.0f;
+			if (scrollLines > 0)
+			{
+				zoomAmount = 1.0f;
+			}
+			else if (scrollLines < 0)
+			{
+				zoomAmount = -1.0f;
+			}
+			DisplayImage_Zoom(zoomAmount);
+		}
 		private void DisplayImage_MouseUp(object sender, MouseEventArgs e)
 		{
+			int curX = e.Location.X;
+			int curY = e.Location.Y;
+			m_mouseCurX = curX;
+			m_mouseCurY = curY;
+
 			if (e.Button == MOUSE_BUTTON_DRAG)
 			{
 				m_dragging = false;
 				this.Cursor = Cursors.Default;
-
-				int curX = e.Location.X;
-				int curY = e.Location.Y;
-				m_mouseCurX = curX;
-				m_mouseCurY = curY;
 
 				UpdateDisplayImage();
 				UpdateDetailImage();
@@ -634,6 +709,14 @@ namespace SamMapTool
 		}
 		private void DisplayImage_MouseClick(object sender, MouseEventArgs e)
 		{
+			if (m_useTimerDoubleClick == false)
+			{
+				if ((m_mouseDownX == m_mouseCurX) && (m_mouseDownY == m_mouseCurY))
+				{
+					DisplayImage_SingleClick(e);
+					return;
+				}
+			}
 			if (m_numClicks == 0)
 			{
 				bool validClick = true;
@@ -661,9 +744,12 @@ namespace SamMapTool
 		}
 		private void DisplayImage_MouseDoubleClick(object sender, MouseEventArgs e)
 		{
-			m_clickTimer.Stop();
-			m_clickTimerMS = 0;
-			m_numClicks = 0;
+			if (m_useTimerDoubleClick == true)
+			{
+				m_clickTimer.Stop();
+				m_clickTimerMS = 0;
+				m_numClicks = 0;
+			}
 			DisplayImage_DoubleClick(e);
 		}
 		private void EnterEastingNorthing(bool useDialogBox)
@@ -756,6 +842,31 @@ namespace SamMapTool
 				this.button_DetailImageTrack.Text = "Track";
 			}
 		}
+		private void EnterNorthMode()
+		{
+			EndEnterNorth();
+			EndEnterEastingNorthing();
+			EndEnterTrees();
+		}
+		private void EnterCalibrateMode()
+		{
+			EndEnterNorth();
+			EndEnterEastingNorthing();
+			EndEnterTrees();
+		}
+		private void EnterTreesMode()
+		{
+			EndEnterNorth();
+			EndEnterEastingNorthing();
+			EndEnterTrees();
+		}
+		private void EndEnterNorth()
+		{
+			m_selectedNorthPoint = -1;
+		}
+		private void EndEnterTrees()
+		{
+		}
 		private void SetNorthCalibrateTreesState()
 		{
 			this.button_Calibrate.Enabled = true;
@@ -768,6 +879,7 @@ namespace SamMapTool
 
 			if (this.m_mode == Mode.NORTH)
 			{
+				EnterNorthMode();
 				this.button_North.Enabled = false;
 				this.scroll_North.Enabled = true;
 				this.button_North.BackColor = System.Drawing.SystemColors.ControlDark;
@@ -775,12 +887,14 @@ namespace SamMapTool
 			}
 			else if (this.m_mode == Mode.CALIBRATE)
 			{
+				EnterCalibrateMode();
 				this.button_Calibrate.Enabled = false;
 				this.button_Calibrate.BackColor = System.Drawing.SystemColors.ControlDark;
 				SetDebugText("Mode:CALIBRATE");
 			}
 			else if (this.m_mode == Mode.TREES)
 			{
+				EnterTreesMode();
 				this.button_Trees.Enabled = false;
 				this.button_Trees.BackColor = System.Drawing.SystemColors.ControlDark;
 				SetDebugText("Mode:TREES");
@@ -806,11 +920,12 @@ namespace SamMapTool
 			this.scroll_North.Enabled = false;
 			SetNorthCalibrateTreesState();
 		}
-		private void scroll_North_ValueChanged(object sender, EventArgs e)
+		private void scroll_North_ValueChanged (object sender, EventArgs e)
 		{
 			if (m_mode != Mode.NORTH)
 			{
 				UpdateNorthScroll();
+				UpdateNorthText();
 			}
 			int value = this.scroll_North.Value;
 			if ((m_settings.m_numNorthPoints == 2) && m_selectedNorthPoint == -1)
@@ -818,19 +933,27 @@ namespace SamMapTool
 				// Mid-point
 				int dX = (m_settings.m_northPoint1_X - m_settings.m_northPoint0_X);
 				int dY = (m_settings.m_northPoint1_Y - m_settings.m_northPoint0_Y);
-				int midX = m_settings.m_northPoint0_X + dX/2;
-				int midY = m_settings.m_northPoint0_Y + dY/2;
-				double len = Math.Sqrt(dX*dX + dY*dY) / 2.0;
+				int midX = m_settings.m_northPoint0_X + dX / 2;
+				int midY = m_settings.m_northPoint0_Y + dY / 2;
+				double len = Math.Sqrt(dX * dX + dY * dY) / 2.0;
 				// value = 0:1000 : 0:360 : 0:2PI
-				double angle = (Convert.ToDouble(value) / 1000.0) * 2.0*Math.PI;
+				double angle = (Convert.ToDouble(value) / 1000.0) * 2.0 * Math.PI;
 				double cosAngle = Math.Cos(angle);
 				double sinAngle = Math.Sin(angle);
 				m_settings.m_northPoint0_X = midX - Convert.ToInt32(len * sinAngle);
 				m_settings.m_northPoint0_Y = midY + Convert.ToInt32(len * cosAngle);
 				m_settings.m_northPoint1_X = midX + Convert.ToInt32(len * sinAngle);
 				m_settings.m_northPoint1_Y = midY - Convert.ToInt32(len * cosAngle);
+				ComputeNorthAngle();
 				RefreshDisplayImage();
 			}
+			else
+			{
+				double angle = (Convert.ToDouble(value) / 1000.0) * 2.0 * Math.PI;
+				m_settings.m_northAngle = (float)angle;
+			}
+			UpdateNorthText();
+			ComputeBestFitEastingNorthing();
 			SetDebugText("North:" + value);
 		}
 		private void scroll_DetailImageScale_ValueChanged(object sender, EventArgs e)
@@ -842,6 +965,10 @@ namespace SamMapTool
 		}
 		private void RefreshDisplayImage()
 		{
+			if (m_displayGR == null)
+			{
+				return;
+			}
 			m_displayGR.Clear(Color.DarkGray);
 			int mX = m_displayImageX;
 			int mY = m_displayImageY;
@@ -862,10 +989,19 @@ namespace SamMapTool
 
 				m_displayGR.DrawImage(m_loadedImage, destRect, srcRect, GraphicsUnit.Pixel);
 			}
-			if (m_settings.m_displayPoints)
+			if (m_enterEastingNorthing == false)
 			{
+				ComputeDetailImageXY();
+				Pen pointColour = new Pen(Color.Red, 1.5f);
 				int pointWidth = 10;
 				int pointHeight = 10;
+				Vector2 pixel = new Vector2(m_mousePixelX, m_mousePixelY);
+				DrawPoint(m_displayGR, pixel, pointColour, pointWidth, pointHeight, sX, sY, 1.0f/m_displayImageDisplayScale);
+			}
+			if (m_settings.m_displayPoints)
+			{
+				float pointWidth = 10.0f;
+				float pointHeight = 10.0f;
 				DrawPoints(m_displayGR, pointWidth, pointHeight, sX, sY, 1.0f/m_displayImageDisplayScale);
 			}
 			if (m_enterEastingNorthing == true)
@@ -910,7 +1046,7 @@ namespace SamMapTool
 			}
 			picturebox_DisplayImage.Image = m_displayImage;
 		}
-		private void DrawPoints(Graphics gr, int pointWidth, int pointHeight, int x0, int y0, float scale)
+		private void DrawPoints(Graphics gr, float pointWidth, float pointHeight, float x0, float y0, float scale)
 		{
 			Pen pointColour = Pens.Yellow;
 			int n = m_settings.m_points.Count;
@@ -922,7 +1058,7 @@ namespace SamMapTool
 				DrawPoint(gr, pixel, pointColour, pointWidth, pointHeight, x0, y0, scale);
 			}
 		}
-		private void DrawArrow (Graphics gr, Vector2 start, Vector2 end, Pen colour, int x0, int y0, float scale)
+		private void DrawArrow (Graphics gr, Vector2 start, Vector2 end, Pen colour, float x0, float y0, float scale)
 		{
 			// Main line
 			DrawLine(gr, start, end, colour, x0, y0, scale);
@@ -948,21 +1084,30 @@ namespace SamMapTool
 				DrawLine(gr, end, head2, colour, x0, y0, scale);
 			}
 		}
-		private void DrawLine(Graphics gr, Vector2 start, Vector2 end, Pen colour, int x0, int y0, float scale)
+		private void DrawLine(Graphics gr, Vector2 start, Vector2 end, Pen colour, float x0, float y0, float scale)
 		{
-			int xs = (int)((float)(start.X - x0) / scale);
-			int ys = (int)((float)(start.Y - y0) / scale);
-			int xe = (int)((float)(end.X - x0) / scale);
-			int ye = (int)((float)(end.Y - y0) / scale);
+			float xs = ((float)((start.X) - x0) / scale);
+			float ys = ((float)((start.Y) - y0) / scale);
+			float xe = ((float)((end.X) - x0) / scale);
+			float ye = ((float)((end.Y) - y0) / scale);
 			gr.DrawLine(colour, xs, ys, xe, ye);
 		}
-		private void DrawPoint(Graphics gr, Vector2 pixel, Pen pointColour, int pointWidth, int pointHeight, int x0, int y0, float scale)
+		private void DrawPoint(Graphics gr, Vector2 pixel, Pen pointColour, float pointWidth, float pointHeight, float x0, float y0, float scale)
 		{
-			int x = (int)((float)(pixel.X - x0) / scale) - pointWidth/2;
-			int y = (int)((float)(pixel.Y - y0) / scale) - pointHeight/2;
+			float x = ((float)((pixel.X) - x0) / scale) - pointWidth/2;
+			float y = ((float)((pixel.Y) - y0) / scale) - pointHeight/2;
 			gr.DrawRectangle(pointColour, x, y, pointWidth, pointHeight);
 			gr.DrawLine(pointColour, x, y, x + pointWidth, y + pointHeight);
 			gr.DrawLine(pointColour, x, y + pointHeight, x + pointWidth, y);
+		}
+		private void ComputeDetailImageXY()
+		{
+			int mX = m_detailImageX + m_displayImageX;
+			int mY = m_detailImageY + m_displayImageY;
+			mX = (int)((float)(mX) / m_displayImageDisplayScale);
+			mY = (int)((float)(mY) / m_displayImageDisplayScale);
+			m_mousePixelX = mX;
+			m_mousePixelY = mY;
 		}
 		private void ComputeImageXY()
 		{
@@ -977,30 +1122,32 @@ namespace SamMapTool
 		}
 		private void RefreshDetailImage()
 		{
-			ComputeImageXY();
+			if (m_detailGR == null)
+			{
+				return;
+			}
 
+			ComputeImageXY();
 			m_detailGR.Clear(Color.DarkGray);
 			int dW = m_detailImageWidth;
 			int dH = m_detailImageHeight;
-			int sW = (int)((float)(m_detailImageWidth) / (float)m_detailImageDisplayScale);
-			int sH = (int)((float)(m_detailImageHeight) / (float)m_detailImageDisplayScale);
-			int sX = m_sourceImagePixelX - (sW / 2);
-			int sY = m_sourceImagePixelY - (sH / 2);
+			float sW = ((float)(m_detailImageWidth) / (float)m_detailImageDisplayScale);
+			float sH = ((float)(m_detailImageHeight) / m_detailImageDisplayScale);
+			float sX = (float)m_sourceImagePixelX - (sW / 2.0f);
+			float sY = (float)m_sourceImagePixelY - (sH / 2.0f);
 			if (m_loadedImage != null) 
 			{
 				int dX = 0;
 				int dY = 0;
 				Rectangle destRect = new Rectangle(dX, dY, dW, dH);
 
-				Rectangle srcRect = new Rectangle(sX, sY, sW, sH);
-
-				m_detailGR.DrawImage(m_loadedImage, destRect, srcRect, GraphicsUnit.Pixel);
+				m_detailGR.DrawImage(m_loadedImage, destRect, sX, sY, sW, sH, GraphicsUnit.Pixel);
 			}
 
 			if (m_settings.m_displayPoints)
 			{
-				int pointWidth = 10;
-				int pointHeight = 10;
+				float pointWidth = 10;
+				float pointHeight = 10;
 				DrawPoints(m_detailGR, pointWidth, pointHeight, sX, sY, 1.0f/m_detailImageDisplayScale);
 			}
 
@@ -1271,6 +1418,8 @@ namespace SamMapTool
 		private float m_detailImageDisplayScale;
 		private int m_detailImageX;
 		private int m_detailImageY;
+		private int m_mousePixelX;
+		private int m_mousePixelY;
 
 		private int m_dragX;
 		private int m_dragY;
@@ -1278,9 +1427,14 @@ namespace SamMapTool
 
 		private int m_easting;
 		private int m_northing;
-		private MouseButtons MOUSE_BUTTON_DRAG = MouseButtons.Left;
+		private MouseButtons MOUSE_BUTTON_ENTER_EASTINGNORTHING = MouseButtons.Left;
+		private MouseButtons MOUSE_BUTTON_ENTER_NORTHPOINT = MouseButtons.Left;
 		private MouseButtons MOUSE_BUTTON_ENTER_EASTING_NORTHING = MouseButtons.Left;
+
+		private MouseButtons MOUSE_BUTTON_DRAG = MouseButtons.Right;
+		private MouseButtons MOUSE_BUTTON_ZOOM = MouseButtons.Right;
 		private MouseButtons MOUSE_BUTTON_DETAIL_LOCK_TOGGLE = MouseButtons.Right;
+		private MouseButtons MOUSE_BUTTON_DETAIL_LOCK_TOGGLE2 = MouseButtons.Middle;
 
 		private System.Windows.Forms.Timer m_clickTimer;
 		private int m_clickTimerMS;
@@ -1295,5 +1449,8 @@ namespace SamMapTool
 		private int m_mouseCurX;
 		private int m_mouseCurY;
 		private int m_selectedNorthPoint;
+		private bool m_useTimerDoubleClick;
+		private int m_mouseDownX;
+		private int m_mouseDownY;
 	}
 }

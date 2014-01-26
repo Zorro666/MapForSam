@@ -1,12 +1,13 @@
-* changing north scroll angle should only work in NORTH mode
-* north angle display text box
 * test north angle change on real image
-** 90 deg
 ** 180 deg
 ** 270 deg
 ** 45 deg
 
 * recompute line fit if north angle changes
+
+* auto-save after adding a calibration point
+* auto-save after setting a north angle
+* auto-save after computing a line fit
 
 * system to enter scale value
 ** lock the scale values
@@ -20,6 +21,12 @@
 
 * Bredon Hill / Empress junction = 434638, 335093
 * Mount Carmell / St. Chads Road = 434881, 335051
+
+* 0 Bus Stop 1: 687, 237
+* 0 Bus Stop 2: 1038, 362
+
+* 90 Bus Stop 1: 491, 690
+* 90 Bus Stop 2: 368, 1038
 
 
 

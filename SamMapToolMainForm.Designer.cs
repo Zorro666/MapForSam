@@ -43,6 +43,7 @@ namespace SamMapTool
             this.button_Save = new System.Windows.Forms.Button();
             this.button_Help = new System.Windows.Forms.Button();
             this.label_North = new System.Windows.Forms.Label();
+            this.text_North = new System.Windows.Forms.TextBox();
             this.scroll_North = new System.Windows.Forms.HScrollBar();
             this.button_North = new System.Windows.Forms.Button();
             this.button_Calibrate = new System.Windows.Forms.Button();
@@ -418,13 +419,27 @@ namespace SamMapTool
             this.label_North.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
             this.label_North.Text = "North:";
             // 
+            // text_North
+            // 
+            this.text_North.Name = "text_North";
+            this.text_North.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.text_North.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.text_North.Location = new System.Drawing.Point(94, 536);
+            this.text_North.TabIndex = 5;
+            this.text_North.Anchor = (System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right);
+            this.text_North.Size = new System.Drawing.Size(40, 20);
+            this.text_North.ReadOnly = true;
+            this.text_North.MaxLength = 3;
+            this.text_North.BackColor = System.Drawing.SystemColors.Window;
+            this.text_North.Text = "";
+            // 
             // scroll_North
             // 
             this.scroll_North.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
             this.scroll_North.Tag = "";
-            this.scroll_North.Size = new System.Drawing.Size(128, 20);
+            this.scroll_North.Size = new System.Drawing.Size(105, 20);
             this.scroll_North.Name = "scroll_North";
-            this.scroll_North.Location = new System.Drawing.Point(104, 536);
+            this.scroll_North.Location = new System.Drawing.Point(140, 536);
             this.scroll_North.Anchor = (System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right);
             this.scroll_North.Maximum = 1009;
             this.scroll_North.TabIndex = 0;
@@ -505,6 +520,7 @@ namespace SamMapTool
             this.panel_Right.Controls.Add(this.text_OriginY);
             this.panel_Right.Controls.Add(this.text_ScaleY);
             this.panel_Right.Controls.Add(this.scroll_North);
+            this.panel_Right.Controls.Add(this.text_North);
             this.panel_Right.Controls.Add(this.label_North);
             this.panel_Right.Controls.Add(this.label_Origin);
             this.panel_Right.Controls.Add(this.text_OriginX);
@@ -555,6 +571,7 @@ namespace SamMapTool
         private System.Windows.Forms.Button button_Save;
         private System.Windows.Forms.Button button_Help;
         private System.Windows.Forms.Label label_North;
+        private System.Windows.Forms.TextBox text_North;
         private System.Windows.Forms.HScrollBar scroll_North;
         private System.Windows.Forms.Button button_North;
         private System.Windows.Forms.Button button_Calibrate;
