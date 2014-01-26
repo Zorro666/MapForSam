@@ -3,13 +3,10 @@
 ** 270 deg
 ** 45 deg
 
-* north mode - highlight point if hovering over it
-* calibration mode - highlight a point if hovering over it
 * trees mode - highlight a point if hovering over it
 
-* auto-save after adding a calibration point
-* auto-save after setting a north angle
-* auto-save after computing a line fit
+* north & calibration mode hover + selection should be in screen pixel coords to match the point not image pixel coords
+* should point width & height be in screen pixel (now) or image pixel (bigger as you zoom in)
 
 * system to enter scale value
 ** lock the scale values
