@@ -5,9 +5,6 @@
 
 * trees mode - highlight a point if hovering over it
 
-* north & calibration mode hover + selection should be in screen pixel coords to match the point not image pixel coords
-* should point width & height be in screen pixel (now) or image pixel (bigger as you zoom in)
-
 * system to enter scale value
 ** lock the scale values
 * system to enter origin value
