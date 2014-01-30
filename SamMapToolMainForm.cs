@@ -23,14 +23,15 @@ namespace SamMapTool
 		}
 		private void Init()
 		{
+			m_draggingPoint = -1;
 			m_northPointWidth = 20.0f;
 			m_northPointHeight = 20.0f;
 			m_eastingNorthingPointWidth = 10.0f;
 			m_eastingNorthingPointHeight = 10.0f;
 			m_hoverCalibrationPoint = -1;
+			m_hoverTreePoint = -1;
 			m_hoverNorthPoint = -1;
 			m_useTimerDoubleClick = false;
-			m_selectedNorthPoint = -1;
 			m_settings.m_numNorthPoints = 0;
 			m_settings.m_northAngle = 0.0;
 			m_mouseCurX = 0;
@@ -178,6 +179,7 @@ namespace SamMapTool
 			m_displayImageY = 0;
 			m_displayImageDisplayScale = 1.0f;
 			m_hoverCalibrationPoint = -1;
+			m_hoverTreePoint = -1;
 			m_hoverNorthPoint = -1;
 
 			SetDebugText(string.Format("Loaded '{0}' {1} x {2}", fileName, m_loadedImageWidth, m_loadedImageHeight));
@@ -404,13 +406,13 @@ namespace SamMapTool
 				}
 				if (m_settings.m_numNorthPoints == 2)
 				{
-					if (m_selectedNorthPoint == 0)
+					if (m_draggingPoint == 0)
 					{
 						m_settings.m_northPoint0_X = pixelX;
 						m_settings.m_northPoint0_Y = pixelY;
 						recompute = true;
 					}
-					if (m_selectedNorthPoint == 1)
+					if (m_draggingPoint == 1)
 					{
 						m_settings.m_northPoint1_X = pixelX;
 						m_settings.m_northPoint1_Y = pixelY;
@@ -587,28 +589,6 @@ namespace SamMapTool
 				m_settings.m_northPoint1_Y = pixelY;
 				SaveSettings(true);
 			}
-			else if (m_settings.m_numNorthPoints == 2)
-			{
-				int maxSelX = (int)((float)(m_northPointWidth) / m_displayImageDisplayScale);
-				int maxSelY = (int)((float)(m_northPointHeight) / m_displayImageDisplayScale);
-				if (m_selectedNorthPoint == -1)
-				{
-					if ((Math.Abs(pixelX - m_settings.m_northPoint0_X) < maxSelX) && 
-							(Math.Abs(pixelY - m_settings.m_northPoint0_Y) < maxSelY))
-					{
-						m_selectedNorthPoint = 0;
-					}
-					else if ((Math.Abs(pixelX - m_settings.m_northPoint1_X) < maxSelX) && 
-								 	(Math.Abs(pixelY - m_settings.m_northPoint1_Y) < maxSelY))
-					{
-						m_selectedNorthPoint = 1;
-					}
-				}
-				else
-				{
-					m_selectedNorthPoint = -1;
-				}
-			}
 			RefreshDisplayImage();
 		}
 		private void EndEnterEastingNorthing()
@@ -728,6 +708,31 @@ namespace SamMapTool
 				this.Cursor = Cursors.Cross;
 				SetDebugText("Dragging Start " + e.Location.ToString());
 			}
+			if (e.Button == MOUSE_BUTTON_SELECT)
+			{
+				m_draggingPoint = -1;
+				if (m_mode == Mode.NORTH)
+				{
+					if (m_hoverNorthPoint != -1)
+					{
+						m_draggingPoint = m_hoverNorthPoint;
+					}
+				}
+				else if (m_mode == Mode.CALIBRATE)
+				{
+					if (m_hoverCalibrationPoint != -1)
+					{
+						m_draggingPoint = m_hoverCalibrationPoint;
+					}
+				}
+				else if (m_mode == Mode.TREES)
+				{
+					if (m_hoverTreePoint != -1)
+					{
+						m_draggingPoint = m_hoverTreePoint;
+					}
+				}
+			}
 			m_downMouseEventArgs = e;
 		}
 		void DisplayImage_MouseLeave(object sender, EventArgs e)
@@ -771,6 +776,10 @@ namespace SamMapTool
 				UpdateDetailImage();
 
 				SetDebugText("Dragging Stop");
+			}
+			if (e.Button == MOUSE_BUTTON_SELECT)
+			{
+				m_draggingPoint = -1;
 			}
 		}
 		private void DisplayImage_MouseClick(object sender, MouseEventArgs e)
@@ -939,27 +948,33 @@ namespace SamMapTool
 		private void EnterNorthMode()
 		{
 			EndEnterNorth();
-			EndEnterEastingNorthing();
+			EndEnterCalibrate();
 			EndEnterTrees();
 		}
 		private void EnterCalibrateMode()
 		{
 			EndEnterNorth();
-			EndEnterEastingNorthing();
+			EndEnterCalibrate();
 			EndEnterTrees();
 		}
 		private void EnterTreesMode()
 		{
 			EndEnterNorth();
-			EndEnterEastingNorthing();
+			EndEnterCalibrate();
 			EndEnterTrees();
 		}
 		private void EndEnterNorth()
 		{
-			m_selectedNorthPoint = -1;
+			m_hoverNorthPoint = -1;
+		}
+		private void EndEnterCalibrate()
+		{
+			m_hoverCalibrationPoint = -1;
+			EndEnterEastingNorthing();
 		}
 		private void EndEnterTrees()
 		{
+			m_hoverTreePoint = -1;
 		}
 		private void SetNorthCalibrateTreesState()
 		{
@@ -1033,7 +1048,7 @@ namespace SamMapTool
 				UpdateNorthText();
 			}
 			int value = this.scroll_North.Value;
-			if ((m_settings.m_numNorthPoints == 2) && m_selectedNorthPoint == -1)
+			if ((m_settings.m_numNorthPoints == 2) && m_draggingPoint == -1)
 			{
 				// Mid-point
 				int dX = (m_settings.m_northPoint1_X - m_settings.m_northPoint0_X);
@@ -1132,11 +1147,11 @@ namespace SamMapTool
 					Pen endColour = pointColour;
 					float pointWidth = m_northPointWidth;
 					float pointHeight = m_northPointHeight;
-					if (m_selectedNorthPoint == 0)
+					if (m_draggingPoint == 0)
 					{
 						startColour = movePointColour;
 					}
-					else if (m_selectedNorthPoint == 1)
+					else if (m_draggingPoint == 1)
 					{
 						endColour = movePointColour;
 					}
@@ -1561,6 +1576,7 @@ namespace SamMapTool
 		private MouseButtons MOUSE_BUTTON_ENTER_NORTHPOINT = MouseButtons.Left;
 		private MouseButtons MOUSE_BUTTON_ENTER_EASTING_NORTHING = MouseButtons.Left;
 
+		private MouseButtons MOUSE_BUTTON_SELECT = MouseButtons.Left;
 		private MouseButtons MOUSE_BUTTON_DRAG = MouseButtons.Right;
 		private MouseButtons MOUSE_BUTTON_ZOOM = MouseButtons.Right;
 		private MouseButtons MOUSE_BUTTON_DETAIL_LOCK_TOGGLE = MouseButtons.Right;
@@ -1578,15 +1594,16 @@ namespace SamMapTool
 		private bool m_enterEastingNorthing;
 		private int m_mouseCurX;
 		private int m_mouseCurY;
-		private int m_selectedNorthPoint;
 		private bool m_useTimerDoubleClick;
 		private int m_mouseDownX;
 		private int m_mouseDownY;
 		private int m_hoverNorthPoint;
 		private int m_hoverCalibrationPoint;
+		private int m_hoverTreePoint;
 		private float m_northPointWidth;
 		private float m_northPointHeight;
 		private float m_eastingNorthingPointWidth;
 		private float m_eastingNorthingPointHeight;
+		private int m_draggingPoint;
 	}
 }

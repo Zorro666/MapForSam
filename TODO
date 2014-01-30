@@ -3,12 +3,17 @@
 ** 270 deg
 ** 45 deg
 
-* trees mode - highlight a point if hovering over it
+* calibrate mode - select a calibrate point by mouse down, then drag to change its XY
+* calibrate mode - click to select an existing point then delete to remove it
+* calibrate mode - click to select an existing point then change its Easting & Northing using Enter Button
+
+* trees mode - enter them by single click
+* trees mode - highlight a tree if hovering over it, mouse down + drag to move it
+* trees mode - click to select an existing tree then delete to remove it
 
 * system to enter scale value
-** lock the scale values
-* system to enter origin value
-** lock the origin values
+** method to lock the scale values (x scale == y scale)
+* system to enter origin value (same as point at 0,0 with easting & northing)
 
 * trees mode : output tree inputs as nice output file
 ** output file format update for sam as he needs
@@ -16,11 +21,16 @@
 * Bredon Hill / Empress junction = 434638, 335093
 * Mount Carmell / St. Chads Road = 434881, 335051
 
+* Bus Stop on Burton Road: 434813, 335231
+
 * 0 Bus Stop 1: 687, 237
 * 0 Bus Stop 2: 1038, 362
 
-* 90 Bus Stop 1: 491, 690
-* 90 Bus Stop 2: 368, 1038
+* 90 Bus Stop 1: 491, 687
+* 90 Bus Stop 2: 367, 1039
+
+* 180 Bus Stop 1: 521, 491
+* 180 Bus Stop 2: 170, 367
 
 
 
