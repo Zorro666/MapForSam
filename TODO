@@ -3,7 +3,6 @@
 ** 270 deg
 ** 45 deg
 
-* calibrate mode - select a calibrate point by mouse down, then drag to change its XY
 * calibrate mode - click to select an existing point then delete to remove it
 * calibrate mode - click to select an existing point then change its Easting & Northing using Enter Button
 

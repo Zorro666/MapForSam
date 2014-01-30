@@ -101,6 +101,7 @@ namespace SamMapTool
 			this.picturebox_DisplayImage.MouseEnter += new System.EventHandler(DisplayImage_MouseEnter);
 
 			this.KeyPress += new KeyPressEventHandler(this_KeyPress);
+			this.KeyDown += new KeyEventHandler(this_KeyDown);
 
 			this.DoubleBuffered = true;
 			SetOriginScale();
@@ -450,6 +451,14 @@ namespace SamMapTool
 				ComputeImageXY();
 				int pixelX = m_sourceImagePixelX;
 				int pixelY = m_sourceImagePixelY;
+				bool recompute = false;
+
+				if (m_draggingPoint != -1)
+				{
+					m_settings.m_points[m_draggingPoint].Pixel.X = pixelX;
+					m_settings.m_points[m_draggingPoint].Pixel.Y = pixelY;
+					recompute = true;
+				}
 				int oldHoverPoint = m_hoverCalibrationPoint;
 				int maxSelX = (int)((float)(m_eastingNorthingPointWidth) / m_displayImageDisplayScale);
 				int maxSelY = (int)((float)(m_eastingNorthingPointHeight) / m_displayImageDisplayScale);
@@ -466,7 +475,12 @@ namespace SamMapTool
 						break;
 					}
 				}
-				if (m_hoverCalibrationPoint != oldHoverPoint)
+				if (recompute)
+				{
+					ComputeBestFitEastingNorthing();
+					SetOriginScale();
+				}
+				if ((m_hoverCalibrationPoint != oldHoverPoint) || (recompute))
 				{
 					RefreshImages();
 				}
@@ -868,6 +882,17 @@ namespace SamMapTool
 				SetStatusText("Enter Easting and Northing values then click 'Enter Easting Northing' button");
 			}
 		}
+		private void this_KeyDown(object sender, KeyEventArgs k)
+		{
+			Rectangle screenRect = this.picturebox_DisplayImage.RectangleToScreen(this.picturebox_DisplayImage.ClientRectangle);
+			if (screenRect.Contains(Control.MousePosition))
+			{
+				if (k.KeyCode == Keys.Delete)
+				{
+					DeleteKey();
+				}
+			}
+		}
 		private void this_KeyPress(object sender, KeyPressEventArgs k)
 		{
 			Rectangle screenRect = this.picturebox_DisplayImage.RectangleToScreen(this.picturebox_DisplayImage.ClientRectangle);
@@ -908,6 +933,18 @@ namespace SamMapTool
 				else if (k.KeyChar == 'q')
 				{
 					Quit();
+				}
+			}
+		}
+		private void DeleteKey()
+		{
+			if (m_mode == Mode.CALIBRATE)
+			{
+				if (m_hoverCalibrationPoint != -1)
+				{
+					m_settings.m_points.RemoveAt(m_hoverCalibrationPoint);
+					ComputeBestFitEastingNorthing();
+					RefreshImages();
 				}
 			}
 		}
