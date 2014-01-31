@@ -259,7 +259,7 @@ namespace SamMapTool
 		private void ComputeBestFitEastingNorthing()
 		{
 			int n = m_settings.m_points.Count;
-			if (n < 1)
+			if (n < 2)
 			{
 				SetStatusText("Need more than one Easting, Northing setting");
 				return;
@@ -328,6 +328,7 @@ namespace SamMapTool
 		private void AddNewEastingNorthing(int newEasting, int newNorthing, int pixelX, int pixelY)
 		{
 			EastingNorthingPoint newPoint = new EastingNorthingPoint(newEasting, newNorthing, pixelX, pixelY);
+/*
 			bool found = false;
 			foreach (EastingNorthingPoint point in m_settings.m_points)
 			{
@@ -340,9 +341,15 @@ namespace SamMapTool
 					break;
 				}
 			}
-			if (found == false)
+*/
+			if (m_hoverCalibrationPoint == -1)
 			{
 				m_settings.m_points.Add(newPoint);
+			}
+			else
+			{
+				m_settings.m_points[m_hoverCalibrationPoint].EastingNorthing.X = newEasting;
+				m_settings.m_points[m_hoverCalibrationPoint].EastingNorthing.Y = newNorthing;
 			}
 
 			ComputeBestFitEastingNorthing();
@@ -611,6 +618,7 @@ namespace SamMapTool
 			{
 				m_settings.m_detailImageTrack = true;
 			}
+			this.button_DetailImageTrack.Enabled = true;
 			m_enterEastingNorthing = false;
 
 			ComputeImageXY();
@@ -668,13 +676,26 @@ namespace SamMapTool
 			}
 			if (displayScale != m_displayImageDisplayScale)
 			{
-				ComputeImageXY();
-				int oldX = m_sourceImagePixelX;
-				int oldY = m_sourceImagePixelY;
+				Point localXY = PointToClient(Control.MousePosition);
+				int mX;
+				int mY;
+
+				mX = localXY.X + m_displayImageX;
+				mY = localXY.Y + m_displayImageY;
+				mX = (int)((float)(mX) / m_displayImageDisplayScale);
+				mY = (int)((float)(mY) / m_displayImageDisplayScale);
+
+				int oldX = mX;
+				int oldY = mY;
 				m_displayImageDisplayScale = displayScale;
-				ComputeImageXY();
-				m_displayImageX -= (int)((float)(m_sourceImagePixelX - oldX) * m_displayImageDisplayScale);
-				m_displayImageY -= (int)((float)(m_sourceImagePixelY - oldY) * m_displayImageDisplayScale);
+
+				mX = localXY.X + m_displayImageX;
+				mY = localXY.Y + m_displayImageY;
+				mX = (int)((float)(mX) / m_displayImageDisplayScale);
+				mY = (int)((float)(mY) / m_displayImageDisplayScale);
+
+				m_displayImageX -= (int)((float)(mX - oldX) * m_displayImageDisplayScale);
+				m_displayImageY -= (int)((float)(mY - oldY) * m_displayImageDisplayScale);
 				SetDebugText("ImageDisplayScale:" + m_displayImageDisplayScale);
 				ComputeImageXY();
 
@@ -879,6 +900,7 @@ namespace SamMapTool
 				m_pointPixelY = m_sourceImagePixelY;
 				RefreshImages();
 				SetDetailImageTrackButtonState();
+				this.button_DetailImageTrack.Enabled = false;
 				SetStatusText("Enter Easting and Northing values then click 'Enter Easting Northing' button");
 			}
 		}
@@ -968,7 +990,10 @@ namespace SamMapTool
 		}
 		private void ToggleDetailImageTrack()
 		{
-			m_settings.m_detailImageTrack ^= true;
+			if (this.button_DetailImageTrack.Enabled == true)
+			{
+				m_settings.m_detailImageTrack ^= true;
+			}
 			SetDetailImageTrackButtonState();
 		}
 		private void SetDetailImageTrackButtonState()
