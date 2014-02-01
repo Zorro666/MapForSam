@@ -146,7 +146,7 @@ namespace SamMapTool
             this.scroll_DetailImageScale.Tag = "";
             this.scroll_DetailImageScale.Size = new System.Drawing.Size(184, 29);
             this.scroll_DetailImageScale.Name = "scroll_DetailImageScale";
-            this.scroll_DetailImageScale.Value = 4;
+            this.scroll_DetailImageScale.Value = 6;
             this.scroll_DetailImageScale.LargeChange = 1;
             this.scroll_DetailImageScale.Location = new System.Drawing.Point(48, 216);
             this.scroll_DetailImageScale.Anchor = (System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right);

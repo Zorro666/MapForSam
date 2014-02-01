@@ -28,6 +28,8 @@ namespace SamMapTool
 			m_northPointHeight = 20.0f;
 			m_eastingNorthingPointWidth = 10.0f;
 			m_eastingNorthingPointHeight = 10.0f;
+			m_treePointWidth = 15.0f;
+			m_treePointHeight = 15.0f;
 			m_hoverCalibrationPoint = -1;
 			m_hoverTreePoint = -1;
 			m_hoverNorthPoint = -1;
@@ -41,7 +43,7 @@ namespace SamMapTool
 			m_mousePixelX = 0;
 			m_mousePixelY = 0;
 			m_enterEastingNorthing = false;
-			m_mode = Mode.CALIBRATE;
+			m_mode = Mode.TREES;
 			SetNorthCalibrateTreesState();
 
 			m_statusText = "";
@@ -53,7 +55,8 @@ namespace SamMapTool
     	m_clickTimer = new System.Windows.Forms.Timer();
 			m_clickTimer.Interval = 10;
 			m_clickTimer.Tick += new EventHandler(ClickTimer_Tick);
-			m_settings.m_points = new List<EastingNorthingPoint>();
+			m_settings.m_calibrationPoints = new List<EastingNorthingPoint>();
+			m_settings.m_trees = new List<EastingNorthingPoint>();
 			m_clickMouseEventArgs = new MouseEventArgs(MouseButtons.None, 0, 0, 0, 0);
 			m_downMouseEventArgs = new MouseEventArgs(MouseButtons.None, 0, 0, 0, 0);
 
@@ -83,7 +86,7 @@ namespace SamMapTool
 
 			m_detailImageX = 0;
 			m_detailImageY = 0;
-			m_detailImageDisplayScale = 2.0f;
+			m_detailImageDisplayScale = (float)this.scroll_DetailImageScale.Value;
 			m_detailImageWidth = this.pictureBox_DetailImage.Width;
 			m_detailImageHeight = this.pictureBox_DetailImage.Height;
 			m_detailImage = new Bitmap(m_detailImageWidth, m_detailImageHeight);
@@ -190,6 +193,15 @@ namespace SamMapTool
 			m_settingsFileName = Path.Combine(dir, filename);
 			this.Text = "Sam's Map Tool || " + fileName;
 			LoadSettings();
+			m_mode = Mode.TREES;
+			if (m_settings.m_numNorthPoints < 2)
+			{
+				m_mode = Mode.NORTH;
+			}
+			else if (m_settings.m_calibrationPoints.Count < 2)
+			{
+				m_mode = Mode.CALIBRATE;
+			}
 			RefreshSettings();
 			ComputeBestFitEastingNorthing();
 
@@ -202,6 +214,7 @@ namespace SamMapTool
 			SetDetailImageTrackButtonState();
 			SetDrawPointsButtonState();
 			SetOriginScale();
+			SetNorthCalibrateTreesState();
 		}
 		private void RefreshImages()
 		{
@@ -258,7 +271,7 @@ namespace SamMapTool
 		}
 		private void ComputeBestFitEastingNorthing()
 		{
-			int n = m_settings.m_points.Count;
+			int n = m_settings.m_calibrationPoints.Count;
 			if (n < 2)
 			{
 				SetStatusText("Need more than one Easting, Northing setting");
@@ -279,7 +292,7 @@ namespace SamMapTool
 
 			for (int i = 0; i < n; i++)
 			{
-				EastingNorthingPoint point = m_settings.m_points[i];
+				EastingNorthingPoint point = m_settings.m_calibrationPoints[i];
 				Vector2 pixel = point.Pixel;
 				Vector2 eastingNorthing = point.EastingNorthing;
 
@@ -330,7 +343,7 @@ namespace SamMapTool
 			EastingNorthingPoint newPoint = new EastingNorthingPoint(newEasting, newNorthing, pixelX, pixelY);
 /*
 			bool found = false;
-			foreach (EastingNorthingPoint point in m_settings.m_points)
+			foreach (EastingNorthingPoint point in m_settings.m_calibrationPoints)
 			{
 				if (point.PixelSame(newPoint))
 				{
@@ -344,12 +357,12 @@ namespace SamMapTool
 */
 			if (m_hoverCalibrationPoint == -1)
 			{
-				m_settings.m_points.Add(newPoint);
+				m_settings.m_calibrationPoints.Add(newPoint);
 			}
 			else
 			{
-				m_settings.m_points[m_hoverCalibrationPoint].EastingNorthing.X = newEasting;
-				m_settings.m_points[m_hoverCalibrationPoint].EastingNorthing.Y = newNorthing;
+				m_settings.m_calibrationPoints[m_hoverCalibrationPoint].EastingNorthing.X = newEasting;
+				m_settings.m_calibrationPoints[m_hoverCalibrationPoint].EastingNorthing.Y = newNorthing;
 			}
 
 			ComputeBestFitEastingNorthing();
@@ -453,7 +466,7 @@ namespace SamMapTool
 					RefreshImages();
 				}
 			}
-			if (m_mode == Mode.CALIBRATE)
+			else if (m_mode == Mode.CALIBRATE)
 			{
 				ComputeImageXY();
 				int pixelX = m_sourceImagePixelX;
@@ -462,8 +475,8 @@ namespace SamMapTool
 
 				if (m_draggingPoint != -1)
 				{
-					m_settings.m_points[m_draggingPoint].Pixel.X = pixelX;
-					m_settings.m_points[m_draggingPoint].Pixel.Y = pixelY;
+					m_settings.m_calibrationPoints[m_draggingPoint].Pixel.X = pixelX;
+					m_settings.m_calibrationPoints[m_draggingPoint].Pixel.Y = pixelY;
 					recompute = true;
 				}
 				int oldHoverPoint = m_hoverCalibrationPoint;
@@ -471,11 +484,11 @@ namespace SamMapTool
 				int maxSelY = (int)((float)(m_eastingNorthingPointHeight) / m_displayImageDisplayScale);
 
 				m_hoverCalibrationPoint = -1;
-				int n = m_settings.m_points.Count;
+				int n = m_settings.m_calibrationPoints.Count;
 				for (int i = 0; i < n; i++)
 				{
-					int pointX = (int)m_settings.m_points[i].Pixel.X;
-					int pointY = (int)m_settings.m_points[i].Pixel.Y;
+					int pointX = (int)m_settings.m_calibrationPoints[i].Pixel.X;
+					int pointY = (int)m_settings.m_calibrationPoints[i].Pixel.Y;
 					if ((Math.Abs(pixelX - pointX) < maxSelX) && (Math.Abs(pixelY - pointY) < maxSelY))
 					{
 						m_hoverCalibrationPoint = i;
@@ -488,6 +501,39 @@ namespace SamMapTool
 					SetOriginScale();
 				}
 				if ((m_hoverCalibrationPoint != oldHoverPoint) || (recompute))
+				{
+					RefreshImages();
+				}
+			}
+			else if (m_mode == Mode.TREES)
+			{
+				ComputeImageXY();
+				int pixelX = m_sourceImagePixelX;
+				int pixelY = m_sourceImagePixelY;
+
+				if (m_draggingPoint != -1)
+				{
+					m_settings.m_trees[m_draggingPoint].Pixel.X = pixelX;
+					m_settings.m_trees[m_draggingPoint].Pixel.Y = pixelY;
+					SaveSettings(true);
+				}
+				int oldHoverPoint = m_hoverTreePoint;
+				int maxSelX = (int)((float)(m_treePointWidth) / m_displayImageDisplayScale);
+				int maxSelY = (int)((float)(m_treePointHeight) / m_displayImageDisplayScale);
+
+				m_hoverTreePoint = -1;
+				int n = m_settings.m_trees.Count;
+				for (int i = 0; i < n; i++)
+				{
+					int pointX = (int)m_settings.m_trees[i].Pixel.X;
+					int pointY = (int)m_settings.m_trees[i].Pixel.Y;
+					if ((Math.Abs(pixelX - pointX) < maxSelX) && (Math.Abs(pixelY - pointY) < maxSelY))
+					{
+						m_hoverTreePoint = i;
+						break;
+					}
+				}
+				if (m_hoverTreePoint != oldHoverPoint)
 				{
 					RefreshImages();
 				}
@@ -588,7 +634,38 @@ namespace SamMapTool
 			}
 			else if (m_mode == Mode.TREES)
 			{
+				if (e.Button == MOUSE_BUTTON_ENTER_TREE)
+				{
+					EnterTree();
+				}
 			}
+		}
+		private void EnterTree()
+		{
+			int pixelX = m_sourceImagePixelX;
+			int pixelY = m_sourceImagePixelY;
+
+			float eastingPixel = 0.0f;
+			float northingPixel = 0.0f;
+			ComputeEastingNorthingPixel((float)pixelX, (float)pixelY, ref eastingPixel, ref northingPixel);
+			float easting = m_settings.m_eastingZero + eastingPixel * m_settings.m_eastingScale;
+			float northing = m_settings.m_northingZero + northingPixel * m_settings.m_northingScale;
+
+			if (m_hoverTreePoint == -1)
+			{
+				EastingNorthingPoint newTree = new EastingNorthingPoint((int)easting, (int)northing, pixelX, pixelY);
+				m_settings.m_trees.Add(newTree);
+			}
+			else
+			{
+				m_settings.m_trees[m_hoverTreePoint].EastingNorthing.X = (int)easting;
+				m_settings.m_trees[m_hoverTreePoint].EastingNorthing.Y = (int)northing;
+				m_settings.m_trees[m_hoverTreePoint].Pixel.X = pixelX;
+				m_settings.m_trees[m_hoverTreePoint].Pixel.Y = pixelY;
+			}
+
+			RefreshImages();
+			SaveSettings(true);
 		}
 		private void EnterNorthPoint ()
 		{
@@ -964,8 +1041,17 @@ namespace SamMapTool
 			{
 				if (m_hoverCalibrationPoint != -1)
 				{
-					m_settings.m_points.RemoveAt(m_hoverCalibrationPoint);
+					m_settings.m_calibrationPoints.RemoveAt(m_hoverCalibrationPoint);
 					ComputeBestFitEastingNorthing();
+					RefreshImages();
+				}
+			}
+			else if (m_mode == Mode.TREES)
+			{
+				if (m_hoverTreePoint != -1)
+				{
+					m_settings.m_trees.RemoveAt(m_hoverTreePoint);
+					SaveSettings(true);
 					RefreshImages();
 				}
 			}
@@ -1186,8 +1272,8 @@ namespace SamMapTool
 			{
 				float pointWidth = m_eastingNorthingPointWidth;
 				float pointHeight = m_eastingNorthingPointHeight;
-				Pen pointColour = new Pen(Color.Yellow, 1.0f);
-				DrawPoints(m_displayGR, pointColour, pointWidth, pointHeight, sX, sY, 1.0f/m_displayImageDisplayScale, true);
+				Pen pointColour = new Pen(Color.Yellow, 1.5f);
+				DrawCalibrationPoints(m_displayGR, pointColour, pointWidth, pointHeight, sX, sY, 1.0f/m_displayImageDisplayScale, true);
 			}
 			if (m_enterEastingNorthing == true)
 			{
@@ -1241,14 +1327,38 @@ namespace SamMapTool
 				Pen arrowColour = new Pen(Color.Blue, 3.0f);
 				DrawArrow(m_displayGR, start, end, arrowColour, sX, sY, 1.0f/m_displayImageDisplayScale);
 			}
+			{
+				float treeWidth = m_treePointWidth;
+				float treeHeight = m_treePointHeight;
+				Pen treeColour = new Pen(Color.Orange, 1.5f);
+				DrawTrees(m_displayGR, treeColour, treeWidth, treeHeight, sX, sY, 1.0f/m_displayImageDisplayScale, true);
+			}
 			picturebox_DisplayImage.Image = m_displayImage;
 		}
-		private void DrawPoints(Graphics gr, Pen pointColour, float pointWidth, float pointHeight, float x0, float y0, float scale, bool drawHover)
+		private void DrawTrees(Graphics gr, Pen pointColour, float pointWidth, float pointHeight, float x0, float y0, float scale, bool drawHover)
 		{
-			int n = m_settings.m_points.Count;
+			int n = m_settings.m_trees.Count;
 			for (int i = 0; i < n; i++)
 			{
-				EastingNorthingPoint point = m_settings.m_points[i];
+				EastingNorthingPoint tree = m_settings.m_trees[i];
+				Vector2 pixel = tree.Pixel;
+
+				DrawPoint(gr, pixel, pointColour, pointWidth, pointHeight, x0, y0, scale);
+				if (drawHover && (i == m_hoverTreePoint))
+				{
+					float hoverWidth = pointWidth * 1.5f;
+					float hoverHeight = pointHeight * 1.5f;
+					Pen hoverColour = new Pen(Color.MediumSpringGreen, 3.5f);
+					DrawPoint(gr, pixel, hoverColour, hoverWidth, hoverHeight, x0, y0, scale);
+				}
+			}
+		}
+		private void DrawCalibrationPoints(Graphics gr, Pen pointColour, float pointWidth, float pointHeight, float x0, float y0, float scale, bool drawHover)
+		{
+			int n = m_settings.m_calibrationPoints.Count;
+			for (int i = 0; i < n; i++)
+			{
+				EastingNorthingPoint point = m_settings.m_calibrationPoints[i];
 				Vector2 pixel = point.Pixel;
 
 				DrawPoint(gr, pixel, pointColour, pointWidth, pointHeight, x0, y0, scale);
@@ -1351,8 +1461,14 @@ namespace SamMapTool
 			{
 				float pointWidth = m_eastingNorthingPointWidth * 2.0f;
 				float pointHeight = m_eastingNorthingPointHeight * 2.0f;
-				Pen pointColour = new Pen(Color.Yellow, 1.5f);
-				DrawPoints(m_detailGR, pointColour, pointWidth, pointHeight, sX, sY, 1.0f/m_detailImageDisplayScale, false);
+				Pen pointColour = new Pen(Color.Yellow, 2.0f);
+				DrawCalibrationPoints(m_detailGR, pointColour, pointWidth, pointHeight, sX, sY, 1.0f/m_detailImageDisplayScale, false);
+			}
+			{
+				float treeWidth = m_treePointWidth * 2.0f;
+				float treeHeight = m_treePointHeight * 2.0f;
+				Pen treeColour = new Pen(Color.Orange, 2.0f);
+				DrawTrees(m_detailGR, treeColour, treeWidth, treeHeight, sX, sY, 1.0f/m_detailImageDisplayScale, false);
 			}
 
 			int halfW = dW / 2;
@@ -1400,7 +1516,8 @@ namespace SamMapTool
 			public float m_northingZero;
 			public float m_eastingScale;
 			public float m_northingScale;
-			public List<EastingNorthingPoint> m_points;
+			public List<EastingNorthingPoint> m_calibrationPoints;
+			public List<EastingNorthingPoint> m_trees;
 			public bool m_displayPoints;
 			public bool m_detailImageTrack;
 			public int m_numNorthPoints;
@@ -1441,14 +1558,24 @@ namespace SamMapTool
 					outputStream.WriteLine("NorthAngle");
 					outputStream.WriteLine(m_northAngle*180.0f/Math.PI);
 					outputStream.WriteLine("NumPoints");
-					outputStream.WriteLine(m_points.Count);
-					for (int i = 0; i < m_points.Count; i++)
+					outputStream.WriteLine(m_calibrationPoints.Count);
+					for (int i = 0; i < m_calibrationPoints.Count; i++)
 					{
 						outputStream.WriteLine("Point[{0}]", i);
-						outputStream.WriteLine(m_points[i].EastingNorthing.X);
-						outputStream.WriteLine(m_points[i].EastingNorthing.Y);
-						outputStream.WriteLine(m_points[i].Pixel.X);
-						outputStream.WriteLine(m_points[i].Pixel.Y);
+						outputStream.WriteLine(m_calibrationPoints[i].EastingNorthing.X);
+						outputStream.WriteLine(m_calibrationPoints[i].EastingNorthing.Y);
+						outputStream.WriteLine(m_calibrationPoints[i].Pixel.X);
+						outputStream.WriteLine(m_calibrationPoints[i].Pixel.Y);
+					}
+					outputStream.WriteLine("NumTrees");
+					outputStream.WriteLine(m_trees.Count);
+					for (int i = 0; i < m_trees.Count; i++)
+					{
+						outputStream.WriteLine("Tree[{0}]", i);
+						outputStream.WriteLine(m_trees[i].EastingNorthing.X);
+						outputStream.WriteLine(m_trees[i].EastingNorthing.Y);
+						outputStream.WriteLine(m_trees[i].Pixel.X);
+						outputStream.WriteLine(m_trees[i].Pixel.Y);
 					}
 
 					outputStream.Close();
@@ -1477,6 +1604,8 @@ namespace SamMapTool
 					StreamReader inputStream = new StreamReader(fileName);
 					string param;
 					string value;
+					m_calibrationPoints.Clear();
+					m_trees.Clear();
 
 					while (inputStream.EndOfStream == false)
 					{
@@ -1533,7 +1662,7 @@ namespace SamMapTool
 						else if (param == "NumPoints")
 						{
 							int numPoints = Convert.ToInt32(value);
-							m_points.Clear();
+							m_calibrationPoints.Clear();
 							for (int i = 0; i < numPoints; i++)
 							{
 								param = inputStream.ReadLine();
@@ -1553,7 +1682,33 @@ namespace SamMapTool
 								value = inputStream.ReadLine();
 								point.Pixel.Y = Convert.ToInt64(value);
 
-								m_points.Add(point);
+								m_calibrationPoints.Add(point);
+							}
+						}
+						else if (param == "NumTrees")
+						{
+							int numTrees = Convert.ToInt32(value);
+							m_trees.Clear();
+							for (int i = 0; i < numTrees; i++)
+							{
+								param = inputStream.ReadLine();
+								if (param != string.Format("Tree[{0}]", i))
+								{
+									MessageBox.Show(String.Format("Load Failed : file '{0}' : unknown parameter '{1}'", fileName, param));
+									inputStream.Close();
+									return false;
+								}
+								EastingNorthingPoint point = new EastingNorthingPoint();
+								value = inputStream.ReadLine();
+								point.EastingNorthing.X = Convert.ToInt64(value);
+								value = inputStream.ReadLine();
+								point.EastingNorthing.Y = Convert.ToInt64(value);
+								value = inputStream.ReadLine();
+								point.Pixel.X = Convert.ToInt64(value);
+								value = inputStream.ReadLine();
+								point.Pixel.Y = Convert.ToInt64(value);
+
+								m_trees.Add(point);
 							}
 						}
 						else
@@ -1636,6 +1791,7 @@ namespace SamMapTool
 		private int m_northing;
 		private MouseButtons MOUSE_BUTTON_ENTER_EASTINGNORTHING = MouseButtons.Left;
 		private MouseButtons MOUSE_BUTTON_ENTER_NORTHPOINT = MouseButtons.Left;
+		private MouseButtons MOUSE_BUTTON_ENTER_TREE = MouseButtons.Left;
 		private MouseButtons MOUSE_BUTTON_ENTER_EASTING_NORTHING = MouseButtons.Left;
 
 		private MouseButtons MOUSE_BUTTON_SELECT = MouseButtons.Left;
@@ -1666,6 +1822,8 @@ namespace SamMapTool
 		private float m_northPointHeight;
 		private float m_eastingNorthingPointWidth;
 		private float m_eastingNorthingPointHeight;
+		private float m_treePointWidth;
+		private float m_treePointHeight;
 		private int m_draggingPoint;
 	}
 }

@@ -3,9 +3,7 @@
 ** 270 deg
 ** 45 deg
 
-* trees mode - enter them by single click
-* trees mode - highlight a tree if hovering over it, mouse down + drag to move it
-* trees mode - click to select an existing tree then delete to remove it
+* settings to save/load : m_mode, detail image scroll, image zoom, image pan
 
 * system to enter scale value
 ** method to lock the scale values (x scale == y scale)
